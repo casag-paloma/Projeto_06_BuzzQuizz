@@ -47,6 +47,7 @@ form {
 }
 
 .fields {
+    margin-bottom: 40px;
     background-color: white;
     box-sizing: border-box;
     padding: 25px 16px 11px 16px;
@@ -56,7 +57,6 @@ form {
     max-width: 600px;
     width: 600px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
-    margin-bottom: 85px;
 }
 
 .title-text-field,
@@ -104,8 +104,10 @@ form {
 }
 
 .btn-criar {
+    box-sizing: border-box;
+    padding: 0 30px;
+    margin-top: 45px;
     height: 54px;
-    width: 355px;
     background-color: #EC362D;
     border-radius: 15px;
     color: #FFF5F4;
@@ -114,4 +116,76 @@ form {
     justify-content: center;
     align-items: center;
     border: none;
+}
+
+.sub-text {
+    height: 44px;
+    color: #818181;
+    font-size: 21px;
+    line-height: 34px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.sub-text:hover,
+.btn-criar:hover {
+    cursor: pointer;
+}
+
+.sub-text:hover {
+    text-decoration: underline;
+}
+
+.criacao-card {
+    width: 500px !important;
+    height: 266px !important;
+}
+
+.criacao-card img {
+    z-index: -1;
+}
+
+.card-quizz img {
+    width: inherit;
+    height: inherit;
+    border-radius: 5px;
+    position: absolute;
+}
+
+.card-quizz {
+    border-radius: 5px;
+    position: relative;
+    height: 181px;
+    width: 340px;
+}
+
+.card-quizz:hover {
+    cursor: pointer;
+    box-shadow: 0 0 15px black;
+}
+
+.degrade-card-quizz {
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    border-radius: 5px;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.5) 65.62%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.card-quizz span {
+    overflow: hidden;
+    height: 54px;
+    line-height: 27px;
+    text-align: start;
+    display: flex;
+    align-items: center;
+    word-break: break-all;
+    right: 23px;
+    left: 23px;
+    bottom: 9px;
+    position: absolute;
+    font-size: 23px;
+    color: white;
 }
