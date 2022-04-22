@@ -1,3 +1,5 @@
+console.log('ta indo..');
+
 const API_URL = 'https://mock-api.driven.com.br/api/v6/buzzquizz';
 const RECURSO_QUIZZES_URL = '/quizzes'; //Aceita GET e POST
 
@@ -7,6 +9,7 @@ let QtdNiveis;
 
 //regex para garantir que o q foi passado é um url válido
 const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/gm;
+const colorRegex = /^#[a-fA-F0-9]{6}/;
 
 /*
     O quizz criado se refere ao quizz q está sendo criado
@@ -41,11 +44,11 @@ function validarInfoBasicas(titulo, imageUrl, qtdPerguntas, qtdNiveis) {
         QtdNiveis = Number(qtdNiveis);
 
         renderFormPerguntasQuizz();
+
     } else {
         alert("Você preencheu os dados de forma errada, preencha novamente!");
     }
 }
-
 
 getQuizzes();
 //requisiçoes
@@ -216,64 +219,158 @@ function renderFormPerguntasQuizz() {
     for (let i = 1; i< QtdPerguntas; i++){
 
         perguntas += `
-        <div class="fields" action='javascript:validarPergunta(titleQuestion.value, colorQuestion.value, textAnswer.value, urlAnswer.value, textAnswer1.value, urlAnswer1.value, textAnswer2.value, urlAnswer2.value, textAnswer3.value, urlAnswer3.value )' >
-            <div class="title-text-field">Pergunta ${i+1}  <img src="/img/preencher.png" alt="" onclick="abrirPergunta(this)"></div>
+        <form action='javascript:validarPergunta(titleQuestion${i+1}.value, colorQuestion${i+1}.value, textAnswer${i+1}.value, urlAnswer${i+1}.value, textAnswer1${i+1}.value, urlAnswer1${i+1}.value, textAnswer2${i+1}.value, urlAnswer2${i+1}.value, textAnswer3${i+1}.value, urlAnswer3${i+1}.value )' >
+            <div class="fields">
+                <div class="title-text-field">Pergunta ${i+1}  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>
+                
+                <div class="hide-questions hidden">
+                <input class="text-field" id="titleQuestion${i+1}" type="text"  minlength="20" placeholder="Texto da pergunta" >
+                <input class="text-field" id="colorQuestion${i+1}" type="text" placeholder="Cor de fundo da pergunta">
             
-            <div class="hide-questions hidden">
-            <input class="text-field" id="titleQuestion" type="text" placeholder="Texto da pergunta" minlength="20">
-            <input class="text-field" id="colorQuestion" type="text" placeholder="Cor de fundo da pergunta">
-           
-            <div class="title-text-field">Resposta correta </div>
-            <input class="text-field" id="textAnswer" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer" type="url" placeholder="Url da imagem ">
-    
-            <div class="title-text-field">Resposta incorreta </div>
-            <input class="text-field" id="textAnswer1" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer1" type="url" placeholder="Url da imagem ">
-            <input class="text-field" id="textAnswer2" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer2" type="url" placeholder="Url da imagem ">
-            <input class="text-field" id="textAnswer3" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer3" type="url" placeholder="Url da imagem ">
-            </div>
-        </div> ` 
+                <div class="title-text-field">Resposta correta </div>
+                <input class="text-field" id="textAnswer${i+1}" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer${i+1}" type="url" placeholder="Url da imagem ">
+        
+                <div class="title-text-field">Resposta incorreta </div>
+                <input class="text-field" id="textAnswer1${i+1}" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer1${i+1}" type="url" placeholder="Url da imagem ">
+                <input class="text-field" id="textAnswer2${i+1}" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer2${i+1}" type="url" placeholder="Url da imagem ">
+                <input class="text-field" id="textAnswer3${i+1}" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer3${i+1}" type="url" placeholder="Url da imagem ">
+                </div>
+            </div> 
+        </form>`
+         
     }
 
-    console.log(perguntas.innerHTML);
-
     const form = `<div class="title-form">Crie suas perguntas</div>
-    <form>
-        <div class="fields" action='javascript:validarPergunta(titleQuestion.value, colorQuestion.value, textAnswer.value, urlAnswer.value, textAnswer1.value, urlAnswer1.value, textAnswer2.value, urlAnswer2.value, textAnswer3.value, urlAnswer3.value )'>
-            <div class="title-text-field">Pergunta 1</div>
-            <input class="text-field" id="titleQuestion" type="text" placeholder="Texto da pergunta" minlength="20">
-            <input class="text-field" id="colorQuestion" type="text" placeholder="Cor de fundo da pergunta">
-           
-            <div class="title-text-field">Resposta correta </div>
-            <input class="text-field" id="textAnswer" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer" type="url" placeholder="Url da imagem ">
+    <div>
+        <form action='javascript:validarPergunta(titleQuestion.value, colorQuestion.value, textAnswer.value, urlAnswer.value, textAnswer1.value, urlAnswer1.value, textAnswer2.value, urlAnswer2.value, textAnswer3.value, urlAnswer3.value)'>
+            <div class="fields">
+                <div class="title-text-field">Pergunta 1</div>
+                <input class="text-field" id="titleQuestion" type="text" minlength="20" placeholder="Texto da pergunta">
+                <input class="text-field" id="colorQuestion" type="text" pattern="[#]{1}[A-F0-9]{6}" placeholder="Cor de fundo da pergunta">
+            
+                <div class="title-text-field">Resposta correta </div>
+                <input class="text-field" id="textAnswer" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer" type="url" placeholder="Url da imagem ">
 
-            <div class="title-text-field">Resposta incorreta </div>
-            <input class="text-field" id="textAnswer1" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer1" type="url" placeholder="Url da imagem ">
-            <input class="text-field" id="textAnswer2" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer2" type="url" placeholder="Url da imagem ">
-            <input class="text-field" id="textAnswer3" type="text" placeholder="Texto da pergunta" >
-            <input class="text-field" id="urlAnswer3" type="url" placeholder="Url da imagem ">
-        </div>
+                <div class="title-text-field">Resposta incorreta </div>
+                <input class="text-field" id="textAnswer1" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer1" type="url" placeholder="Url da imagem ">
+                <input class="text-field" id="textAnswer2" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer2" type="url" placeholder="Url da imagem ">
+                <input class="text-field" id="textAnswer3" type="text" placeholder="Texto da pergunta" >
+                <input class="text-field" id="urlAnswer3" type="url" placeholder="Url da imagem ">
+            </div>
+        </form>
 
         ${perguntas}
 
-        <button type="submit" class="btn-criar">Prosseguir para criar níveis</button>
-    </form>`;
-
+        <button type="submit" onclick = "submitAll()"class="btn-criar">Prosseguir para criar níveis</button>
+    </div>`;
     const divMain = document.querySelector("main");
     divMain.innerHTML = form;
 }
 
-function abrirPergunta(img){
-    let elemento = img.parentNode;
-    let form = elemento.parentNode;
+function abrirElemento(elemento){
+    let div = elemento.parentNode;
+    let form = div.parentNode;
     let listaesc = form.querySelector(".hide-questions");
     listaesc.classList.toggle('hidden');
 }
 
-//validações info basicas criaçao de quizz
+function validarPergunta(pergunta, cor, resposta, url, resposta1, url1, resposta2, url2, resposta3, url3) {
+    console.log('tá indo...')
+    console.log(pergunta);
+    console.log(cor);
+    console.log(resposta);
+    console.log(url);
+    console.log(resposta1);
+    console.log(url1);
+    console.log(resposta2);
+    console.log(url2);
+    console.log(resposta3);
+    console.log(url3);
+
+    if (questionIsValid(pergunta) && colorIsValid(cor)
+        && answerIsValid(resposta, url)
+        && (answerIsValid(resposta1, url1)|| answerIsValid(resposta2, url2) || answerIsValid(resposta3, url3))){
+          console.log ('tá funcionando...');
+        //aqui vai renderizar a proxima etapa das perguntas
+    } else {
+        alert("Você preencheu os dados de forma errada, preencha novamente!");
+    }
+}
+
+function submitAll(){
+    const forms = document.forms;
+    for(let i = 0; i < forms.length; i++){
+        const formValido = forms[i].reportValidity();
+            if(formValido){
+                forms[i].submit();
+            }
+    }
+}
+
+//validações perguntas criaçao de quizz
+
+function questionIsValid(texto) {
+    if (texto != null && texto !="")
+        return true;
+    return false;
+}
+
+function answerIsValid(texto, url){
+    if (questionIsValid(texto) && urlIsValid(url))
+        return true;
+    return false;
+}
+
+function colorIsValid(cor){
+    if (cor.match(colorRegex))
+        return true;
+    return false;
+}
+
+function renderFormNiveisQuizz() {
+    console.log(QtdNiveis);
+    let niveis = "";
+
+    for (let i = 1; i< QtdNiveis; i++){
+
+        niveis += `
+        <form action='javascript:validarNivel(titleLevel.value, %right.value, urlLevel.value, descriptionLevel.value)'>
+            <div class="fields">
+                <div class="title-text-field">Nivel ${i+1}  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>                
+                <div class="hide-questions hidden">
+                    <input class="text-field" id="titleLevel" type="text" minlength="10" placeholder="Título do nível">
+                    <input class="text-field" id="%right" type="number" placeholder="% de acerto mínima" minlength="0" maxlength="100">
+                    <input class="text-field" id="urlLevel" type="url" placeholder="Url da imagem do nível ">
+                    <input class="text-field" id="descriptionLevel" type="text" placeholder="Descrição do nível" minlength="30" >
+                </div>
+            </div>
+        </form>`
+         
+    }
+
+    const form = `<div class="title-form">Agora, decida os níveis</div>
+    <div>
+        <form action='javascript:validarNivel(titleLevel.value, %right.value, urlLevel.value, descriptionLevel.value)'>
+            <div class="fields">
+                <div class="title-text-field">Nível 1</div>
+                <input class="text-field" id="titleLevel" type="text" minlength="10" placeholder="Título do nível">
+                <input class="text-field" id="%right" type="number" placeholder="% de acerto mínima" minlength="0" maxlength="100">
+                <input class="text-field" id="urlLevel" type="url" placeholder="Url da imagem do nível ">
+                <input class="text-field" id="descriptionLevel" type="text" placeholder="Descrição do nível" minlength="30" >
+            </div>
+        </form>
+
+        ${niveis}
+
+        <button type="submit" onclick = "submitAll()"class="btn-criar">Finalizar Quizz</button>`;
+    const divMain = document.querySelector("main");
+    divMain.innerHTML = form;
+}
+
