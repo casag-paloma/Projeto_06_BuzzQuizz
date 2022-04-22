@@ -1,6 +1,9 @@
 const API_URL = 'https://mock-api.driven.com.br/api/v6/buzzquizz';
 const RECURSO_QUIZZES_URL = '/quizzes'; //Aceita GET e POST
 
+//preciso pegar os valores de qtdPerguntas e qtdniveis pras outras funções..
+let QtdPerguntas;
+let QtdNiveis;
 
 //regex para garantir que o q foi passado é um url válido
 const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/gm;
@@ -34,6 +37,10 @@ function validarInfoBasicas(titulo, imageUrl, qtdPerguntas, qtdNiveis) {
         && qtdNiveisIsValid(qtdNiveis)) {
 
         //aqui vai renderizar a proxima etapa das perguntas
+        QtdPerguntas = Number(qtdPerguntas);
+        QtdNiveis = Number(qtdNiveis);
+
+        renderFormPerguntasQuizz();
     } else {
         alert("Você preencheu os dados de forma errada, preencha novamente!");
     }
@@ -56,7 +63,6 @@ function getQuizzes() {
         console.log(error);
     });
 }
-
 
 
 //construtores recebem um mapa como parametro e retornam o objeto
@@ -156,6 +162,7 @@ function renderQuizzCreated(quizz) {
     divMain.innerHTML = quizzToRender;
 }
 
+
 function renderFormInfoBasicaQuizz() {
     const form = `<div class="title-form">Comece pelo começo</div>
         <form
@@ -199,3 +206,74 @@ function qtdNiveisIsValid(qtdNiveis) {
         return true;
     return false;
 }
+
+// Formulário de Criação de Perguntas - tela 3.2
+
+function renderFormPerguntasQuizz() {
+    console.log(QtdPerguntas);
+    let perguntas = "";
+
+    for (let i = 1; i< QtdPerguntas; i++){
+
+        perguntas += `
+        <div class="fields" action='javascript:validarPergunta(titleQuestion.value, colorQuestion.value, textAnswer.value, urlAnswer.value, textAnswer1.value, urlAnswer1.value, textAnswer2.value, urlAnswer2.value, textAnswer3.value, urlAnswer3.value )' >
+            <div class="title-text-field">Pergunta ${i+1}  <img src="/img/preencher.png" alt="" onclick="abrirPergunta(this)"></div>
+            
+            <div class="hide-questions hidden">
+            <input class="text-field" id="titleQuestion" type="text" placeholder="Texto da pergunta" minlength="20">
+            <input class="text-field" id="colorQuestion" type="text" placeholder="Cor de fundo da pergunta">
+           
+            <div class="title-text-field">Resposta correta </div>
+            <input class="text-field" id="textAnswer" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer" type="url" placeholder="Url da imagem ">
+    
+            <div class="title-text-field">Resposta incorreta </div>
+            <input class="text-field" id="textAnswer1" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer1" type="url" placeholder="Url da imagem ">
+            <input class="text-field" id="textAnswer2" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer2" type="url" placeholder="Url da imagem ">
+            <input class="text-field" id="textAnswer3" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer3" type="url" placeholder="Url da imagem ">
+            </div>
+        </div> ` 
+    }
+
+    console.log(perguntas.innerHTML);
+
+    const form = `<div class="title-form">Crie suas perguntas</div>
+    <form>
+        <div class="fields" action='javascript:validarPergunta(titleQuestion.value, colorQuestion.value, textAnswer.value, urlAnswer.value, textAnswer1.value, urlAnswer1.value, textAnswer2.value, urlAnswer2.value, textAnswer3.value, urlAnswer3.value )'>
+            <div class="title-text-field">Pergunta 1</div>
+            <input class="text-field" id="titleQuestion" type="text" placeholder="Texto da pergunta" minlength="20">
+            <input class="text-field" id="colorQuestion" type="text" placeholder="Cor de fundo da pergunta">
+           
+            <div class="title-text-field">Resposta correta </div>
+            <input class="text-field" id="textAnswer" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer" type="url" placeholder="Url da imagem ">
+
+            <div class="title-text-field">Resposta incorreta </div>
+            <input class="text-field" id="textAnswer1" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer1" type="url" placeholder="Url da imagem ">
+            <input class="text-field" id="textAnswer2" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer2" type="url" placeholder="Url da imagem ">
+            <input class="text-field" id="textAnswer3" type="text" placeholder="Texto da pergunta" >
+            <input class="text-field" id="urlAnswer3" type="url" placeholder="Url da imagem ">
+        </div>
+
+        ${perguntas}
+
+        <button type="submit" class="btn-criar">Prosseguir para criar níveis</button>
+    </form>`;
+
+    const divMain = document.querySelector("main");
+    divMain.innerHTML = form;
+}
+
+function abrirPergunta(img){
+    let elemento = img.parentNode;
+    let form = elemento.parentNode;
+    let listaesc = form.querySelector(".hide-questions");
+    listaesc.classList.toggle('hidden');
+}
+
+//validações info basicas criaçao de quizz
