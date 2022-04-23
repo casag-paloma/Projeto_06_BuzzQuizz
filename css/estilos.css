@@ -12,6 +12,7 @@ body {
 
 body,
 button,
+.usuario,
 input,
 input::placeholder {
     font-family: 'Roboto',
@@ -132,6 +133,7 @@ form {
     margin-top: 8px;
 }
 
+.usuario>button,
 .sub-text:hover,
 .title-text-field > img:hover,
 .btn-criar:hover {
@@ -197,6 +199,42 @@ form {
 .card-quizz .criacao-card span {
     line-height: 27px;
     font-size: 23px;
+}
+
+/*  QUIZZES DO USUÁRIO */
+
+.usuario{
+    width: 100%;
+    margin: 77px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #D4D4D4;
+}
+
+.text{
+    width: 250px;
+    margin-top: 30px;
+    color: #B9B9B9;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 23px;
+    text-align: center;
+}
+
+.usuario>button{
+    background-color: #FAFAFA;
+    border: 1px dashed #EC362D;
+    border-radius: 30px;
+    box-sizing: border-box;
+    color: #EC362D;
+    font-weight: 400;
+    font-size: 21px;
+    line-height: 25px;
+    margin: 20px auto 33px auto;
+    padding: 5px 22px;
+
 }
 
 /*LISTA DE QUIZZES*/

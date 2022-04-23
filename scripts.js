@@ -6,6 +6,8 @@ const RECURSO_QUIZZES_URL = '/quizzes'; //Aceita GET e POST
 //preciso pegar os valores de qtdPerguntas e qtdniveis pras outras funções..
 let QtdPerguntas;
 let QtdNiveis;
+let contador;
+let contadorNiveis;
 
 //regex para garantir que o q foi passado é um url válido
 const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/gm;
@@ -50,7 +52,19 @@ function validarInfoBasicas(titulo, imageUrl, qtdPerguntas, qtdNiveis) {
     }
 }
 
-getQuizzes();
+function iniciarBuzzQuizz(){
+    document.querySelector("main").innerHTML= `
+    <div class="usuario">
+            <div class="text">
+                Você não criou nenhum quizz ainda :(
+            </div>
+            <button onclick="renderFormInfoBasicaQuizz()"> Criar Quizz</button>
+        </div>`;
+
+    getQuizzes();
+}
+
+
 //requisiçoes
 function getQuizzes() {
     const promise = axios.get(API_URL + RECURSO_QUIZZES_URL);
@@ -130,7 +144,7 @@ function renderListQuizzes(quizzes) {
             </div>
         </div>
     `;
-    document.querySelector("main").innerHTML = quizzesList;
+    document.querySelector("main").innerHTML += quizzesList;
     quizzes.map(renderCardQuizzLista);
 }
 
@@ -298,19 +312,25 @@ function validarPergunta(pergunta, cor, resposta, url, resposta1, url1, resposta
         && answerIsValid(resposta, url)
         && (answerIsValid(resposta1, url1)|| answerIsValid(resposta2, url2) || answerIsValid(resposta3, url3))){
           console.log ('tá funcionando...');
-        //aqui vai renderizar a proxima etapa das perguntas
-    } else {
-        alert("Você preencheu os dados de forma errada, preencha novamente!");
-    }
+          contador++;
+    } 
 }
 
 function submitAll(){
     const forms = document.forms;
+    contador = 0;
     for(let i = 0; i < forms.length; i++){
         const formValido = forms[i].reportValidity();
             if(formValido){
                 forms[i].submit();
+                
             }
+    }
+    if (contador === (forms.length)){
+        renderFormNiveisQuizz();
+    }
+    else{
+        alert("Você preencheu os dados de forma errada, preencha novamente!");
     }
 }
 
@@ -369,8 +389,69 @@ function renderFormNiveisQuizz() {
 
         ${niveis}
 
-        <button type="submit" onclick = "submitAll()"class="btn-criar">Finalizar Quizz</button>`;
+        <button type="submit" onclick = "submitAllNiveis()"class="btn-criar">Finalizar Quizz</button>`;
     const divMain = document.querySelector("main");
     divMain.innerHTML = form;
 }
 
+function validarNivel(titulo, acertos, url, descricao) {
+    console.log('tá indo...')
+    console.log(titulo);
+    console.log(acertos);
+    console.log(url);
+    console.log(descricao);
+
+    if (tituloNivelisValid(titulo) && acertoIsValid(acertos) && urlIsValid(url) && descricaoNivelisValid(descricao)){
+          console.log ('tá funcionando...');
+          contador++
+    } 
+}
+
+function tituloNivelisValid(titulo){
+    if(titulo.length > 10){
+        return true;
+    } else{
+        return false;
+    }
+}
+
+function acertoIsValid(acertos){
+    const percAcertos  = Number(acertos);
+    if(percAcertos >= 0 && percAcertos <= 100){
+        if(percAcertos === 0){
+            contadorNiveis++;
+        }
+        return true ;
+    } else{
+        return false;
+    }
+}
+
+function descricaoNivelisValid(titulo){
+    if(titulo.length > 30){
+        return true;
+    } else{
+        return false;
+    }
+}
+
+function submitAllNiveis(){
+    const forms = document.forms;
+    contador = 0;
+    for(let i = 0; i < forms.length; i++){
+        const formValido = forms[i].reportValidity();
+            if(formValido){
+                forms[i].submit();
+            }
+    }
+    if (contador === (forms.length -1) && contadorNiveis >=1){
+        //aqui vai renderizar a proxima etapa das perguntas
+
+    }
+    else{
+        alert("Você preencheu os dados de forma errada, preencha novamente!");
+    }
+}
+
+
+iniciarBuzzQuizz();
