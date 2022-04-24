@@ -12,6 +12,7 @@ body {
 
 body,
 button,
+.usuario,
 input,
 input::placeholder {
     font-family: 'Roboto',
@@ -46,6 +47,7 @@ form {
     align-items: center;
 }
 
+
 .fields {
     margin-bottom: 40px;
     background-color: white;
@@ -57,6 +59,10 @@ form {
     max-width: 600px;
     width: 600px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+}
+
+.fields>div {
+    width: 100%;
 }
 
 .title-text-field,
@@ -134,6 +140,7 @@ form {
     margin-top: 8px;
 }
 
+.usuario>button,
 .sub-text:hover,
 .title-text-field>img:hover,
 .btn-criar:hover {
@@ -201,6 +208,42 @@ form {
     font-size: 23px;
 }
 
+/*  QUIZZES DO USUÁRIO */
+
+.usuario {
+    width: 100%;
+    margin: 77px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #D4D4D4;
+}
+
+.text {
+    width: 250px;
+    margin-top: 30px;
+    color: #B9B9B9;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 23px;
+    text-align: center;
+}
+
+.usuario>button {
+    background-color: #FAFAFA;
+    border: 1px dashed #EC362D;
+    border-radius: 30px;
+    box-sizing: border-box;
+    color: #EC362D;
+    font-weight: 400;
+    font-size: 21px;
+    line-height: 25px;
+    margin: 20px auto 33px auto;
+    padding: 5px 22px;
+
+}
+
 /*LISTA DE QUIZZES*/
 
 main>div>span {
@@ -226,6 +269,17 @@ main>div {
 
 .hidden {
     display: none;
+}
+
+/*Para os boxes com error*/
+.error-input {
+    background-color: #FFE9E9;
+}
+
+.error-text {
+    font-size: 16px;
+    color: #EC362D;
+    margin-bottom: 17px;
 }
 
 @media (max-width:1100px) {}

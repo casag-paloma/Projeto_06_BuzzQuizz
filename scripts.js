@@ -1,10 +1,12 @@
 const API_URL = 'https://mock-api.driven.com.br/api/v6/buzzquizz';
 const RECURSO_QUIZZES_URL = '/quizzes'; //Aceita GET e POST
 
+let qtdPerguntas;
+let qtdNiveis;
+
 //regex para garantir que o q foi passado é um url válido
 const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/gm;
 const colorRegex = /^#[a-fA-F0-9]{6}/;
-
 
 renderFormInfoBasicaQuizz();
 /*
@@ -28,6 +30,19 @@ renderFormInfoBasicaQuizz();
         minValue:numero
 */
 const quizzCriadoObj = {};
+
+function iniciarBuzzQuizz() {
+    document.querySelector("main").innerHTML = `
+    <div class="usuario">
+            <div class="text">
+                Você não criou nenhum quizz ainda :(
+            </div>
+            <button onclick="renderFormInfoBasicaQuizz()"> Criar Quizz</button>
+        </div>`;
+
+    getQuizzes();
+}
+
 
 //requisiçoes
 function getQuizzes() {
@@ -63,7 +78,7 @@ function renderListQuizzes(quizzes) {
             </div>
         </div>
     `;
-    document.querySelector("main").innerHTML = quizzesList;
+    document.querySelector("main").innerHTML += quizzesList;
     quizzes.map(renderCardQuizzLista);
 }
 
@@ -80,17 +95,6 @@ function renderCardQuizzLista(quizz) {
 }
 
 
-//Funçoes utilitárias
-//Percorre todos os forms na tela e vai dando submit
-function submitAll() {
-    const forms = document.forms;
-    for (let i = 0; i < forms.length; i++) {
-        const formValido = forms[i].reportValidity();
-        if (formValido) {
-            forms[i].submit();
-        }
-    }
-}
 
 //Construtores ================================
 //construtores recebem um mapa como parametro e retornam o objeto
@@ -130,7 +134,6 @@ function levelConstructor(levelData) {
 
 
 //CRIACAO DE QUIZ ==============================
-
 //Visual Utilitario
 //Abre e fecha os elementos
 function abrirElemento(elemento) {
@@ -164,16 +167,13 @@ function renderQuizzCreated(quizz) {
 
 function renderFormInfoBasicaQuizz() {
     const form = `<div class="title-form">Comece pelo começo</div>
-        <form
-            action='javascript:validarInfoBasicas(titleQuizz.value, urlQuizz.value, qtdPergQuizz.value, qtdNiveisQuizz.value)'>
+        <form action="javascript:validarFormInfoBasica()">
             <div class="fields">
-                <input class="text-field" id="titleQuizz" type="text" placeholder="Título do seu quizz" minlength="20"
-                    maxlength="65">
-                <input class="text-field" id="urlQuizz" type="url" placeholder="Url da imagem do seu quizz">
-                <input class="text-field" id="qtdPergQuizz" type="number"
-                    placeholder="Quantidade de perguntas do quizz">
-                <input class="text-field" id="qtdNiveisQuizz" type="number" placeholder="Quantidade de níveis do quizz">
-            </div>
+                <div><input class="text-field" name="titulo" type="text" placeholder="Título do seu quizz"></div>
+                <div><input class="text-field" name="url" type="url" placeholder="Url da imagem do seu quizz"></div>
+                <div><input class="text-field" name="qtdPerguntas" type="number" placeholder="Quantidade de perguntas do quizz"></div>
+                <div><input class="text-field" name="quantidadeNiveis" type="number" placeholder="Quantidade de níveis do quizz"></div>     
+                </div>
             <button type="submit" class="btn-criar">Prosseguir para criar perguntas</button>
         </form>`;
 
@@ -181,7 +181,9 @@ function renderFormInfoBasicaQuizz() {
     divMain.innerHTML = form;
 }
 
-function renderFormNiveisQuizz(qtdNiveis) {
+
+
+function renderFormNiveisQuizz() {
     let niveis = "";
     for (let i = 0; i < qtdNiveis; i++) {
         niveis += `
@@ -210,29 +212,28 @@ function renderFormNiveisQuizz(qtdNiveis) {
 }
 
 // Formulário de Criação de Perguntas - tela 3.2
-function renderFormPerguntasQuizz(qtdPerguntas, qtdNiveis) {
+function renderFormPerguntasQuizz() {
     let perguntas = "";
     for (let i = 0; i < qtdPerguntas; i++) {
         perguntas += `
-        <form action='javascript:validarPergunta(titleQuestion${i + 1}.value, colorQuestion${i + 1}.value, textAnswer${i + 1}.value, urlAnswer${i + 1}.value, textAnswer1${i + 1}.value, urlAnswer1${i + 1}.value, textAnswer2${i + 1}.value, urlAnswer2${i + 1}.value, textAnswer3${i + 1}.value, urlAnswer3${i + 1}.value )' >
+        <form action='javascript:validarPerguntas()'>
             <div class="fields">
                 <div class="title-text-field">Pergunta ${i + 1}  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>
+                <div class="hide-questions ${i != 0 ? 'hidden' : ''}">
+                    <div><input class="text-field" name="titleQuestion${i + 1}" type="text" placeholder="Texto da pergunta"></div>    
+                    <div><input class="text-field" name="colorQuestion${i + 1}" type="text" placeholder="Cor de fundo da pergunta (#FFFFFF)"></div>
                 
-                <div class="hide-questions  ${i != 0 ? 'hidden' : ''}">
-                <input class="text-field" id="titleQuestion${i + 1}" type="text"  minlength="20" placeholder="Texto da pergunta" >
-                <input class="text-field" id="colorQuestion${i + 1}" type="text" placeholder="Cor de fundo da pergunta (#FFFFFF)">
+                    <div class="title-text-field">Resposta correta </div>
+                    <div><input class="text-field" name="textAnswer${i + 1}" type="text" placeholder="Texto da pergunta"></div>
+                    <div><input class="text-field" name="urlAnswer${i + 1}" type="url" placeholder="Url da imagem"></div>
             
-                <div class="title-text-field">Resposta correta </div>
-                <input class="text-field" id="textAnswer${i + 1}" type="text" placeholder="Texto da pergunta" >
-                <input class="text-field" id="urlAnswer${i + 1}" type="url" placeholder="Url da imagem ">
-        
-                <div class="title-text-field">Resposta incorreta </div>
-                <input class="text-field" id="textAnswer1${i + 1}" type="text" placeholder="Texto da pergunta" >
-                <input class="text-field" id="urlAnswer1${i + 1}" type="url" placeholder="Url da imagem ">
-                <input class="text-field" id="textAnswer2${i + 1}" type="text" placeholder="Texto da pergunta" >
-                <input class="text-field" id="urlAnswer2${i + 1}" type="url" placeholder="Url da imagem ">
-                <input class="text-field" id="textAnswer3${i + 1}" type="text" placeholder="Texto da pergunta" >
-                <input class="text-field" id="urlAnswer3${i + 1}" type="url" placeholder="Url da imagem ">
+                    <div class="title-text-field">Resposta incorreta </div>
+                    <div><input class="text-field" name="textAnswer1${i + 1}" type="text" placeholder="Texto da pergunta"></div>
+                    <div><input class="text-field" name="urlAnswer1${i + 1}" type="url" placeholder="Url da imagem"></div>
+                    <div><input class="text-field" name="textAnswer2${i + 1}" type="text" placeholder="Texto da pergunta"></div>
+                    <div><input class="text-field" name="urlAnswer2${i + 1}" type="url" placeholder="Url da imagem"></div>
+                    <div><input class="text-field" name="textAnswer3${i + 1}" type="text" placeholder="Texto da pergunta"></div>
+                    <div><input class="text-field" name="urlAnswer3${i + 1}" type="url" placeholder="Url da imagem"></div>
                 </div>
             </div> 
         </form>`
@@ -240,135 +241,328 @@ function renderFormPerguntasQuizz(qtdPerguntas, qtdNiveis) {
     const form = `<div class="title-form">Crie suas perguntas</div>
     <div>
         ${perguntas}
-        <button type="submit" onclick = "submitAll(${true}, ${qtdNiveis})" class="btn-criar">Prosseguir para criar níveis</button>
+        <button type="submit" onclick = "submitAll()" class="btn-criar">Prosseguir para criar níveis</button>
     </div>`;
     const divMain = document.querySelector("main");
     divMain.innerHTML = form;
 }
 
-//Validacoes na criacao de quizz
-function validarInfoBasicas(titulo, imageUrl, qtdPerguntas, qtdNiveis) {
-    if (tituloIsValid(titulo)
-        && urlIsValid(imageUrl)
-        && qtdPerguntasIsValid(qtdPerguntas)
-        && qtdNiveisIsValid(qtdNiveis)) {
-        quizzCriadoObj.title = titulo;
-        quizzCriadoObj.image = imageUrl;
-        renderFormPerguntasQuizz(qtdPerguntas, qtdNiveis);
-    } else {
-        alert("Você preencheu os dados de forma errada, preencha novamente!");
+
+
+function validarFormInfoBasica() {
+    //preciso fazer isso pra gerar os avisos todos
+    const listaInputs = document.querySelectorAll("input");
+    const _tituloIsValid = tituloIsValid(listaInputs[0]);
+    const _urlIsValid = urlIsValid(listaInputs[1]);
+    const _qtdPerguntasIsValid = qtdPerguntasIsValid(listaInputs[2]);
+    const _qtdNiveisIsValid = qtdNiveisIsValid(listaInputs[3]);
+    if (_tituloIsValid && _urlIsValid && _qtdPerguntasIsValid && _qtdNiveisIsValid) {
+        quizzCriadoObj.title = listaInputs[0].value;
+        quizzCriadoObj.image = listaInputs[1].value;
+        qtdPerguntas = listaInputs[2].value;
+        qtdNiveis = listaInputs[3].value;
+        renderFormPerguntasQuizz();
     }
 }
 
+function validarPerguntas() {
+    const validadores = [];
+    const questions = [];
+    const element = document.querySelectorAll("form");
+    for (let index = 0; index < element.length; index++) {
+        const respostas = []; //array do objeto
+        const form = element[index];
+        const pergunta = form.querySelector(`[name="titleQuestion${index + 1}"]`);
+        const cor = form.querySelector(`[name="colorQuestion${index + 1}"]`);
 
-function validarPergunta(pergunta, cor, resposta, url, resposta1, url1, resposta2, url2, resposta3, url3) {
-    if (questionIsValid(pergunta) && colorIsValid(cor)
-        && correctAnswerIsValid(resposta, url)
-        && verifyWrongAnswers(resposta1, url1, resposta2, url2, resposta3, url3)) {
-        if (quizzCriadoObj.questions == null) {
-            quizzCriadoObj.questions = [];
-        }
-        const respostas = [];
-        respostas.push({
-            texto: resposta,
-            image: url,
-            isCorrectAnswer: true
-        });
-        if (resposta1 != null && resposta1 != "" && url1 != null && url1 != "") {
+        const correctResponse = form.querySelector(`[name="textAnswer${index + 1}"]`);
+        const correctUrl = form.querySelector(`[name="urlAnswer${index + 1}"]`);
+
+        const response1 = form.querySelector(`[name="textAnswer1${index + 1}"]`);
+        const url1 = form.querySelector(`[name="urlAnswer1${index + 1}"]`);
+
+        const response2 = form.querySelector(`[name="textAnswer2${index + 1}"]`);
+        const url2 = form.querySelector(`[name="urlAnswer2${index + 1}"]`);
+
+        const response3 = form.querySelector(`[name="textAnswer3${index + 1}"]`);
+        const url3 = form.querySelector(`[name="urlAnswer3${index + 1}"]`);
+
+        const _questionIsValid = questionIsValid(pergunta);
+        const _colorIsValid = colorIsValid(cor);
+        const _correctAnswerIsValid = correctAnswerIsValid(correctResponse, correctUrl);
+        const _wrongAnswersIsValid = verifyWrongAnswers(response1, url1, response2, url2, response3, url3);
+
+        if (_questionIsValid && _colorIsValid && _correctAnswerIsValid && _wrongAnswersIsValid) {
             respostas.push({
-                texto: resposta1,
-                image: url1,
-                isCorrectAnswer: false
+                text: correctResponse.value,
+                image: correctUrl.value,
+                isCorrectAnswer: true,
             });
+            if (response1.value != "" && url1.value != "") {
+                respostas.push({
+                    text: response1.value,
+                    image: url1.value,
+                    isCorrectAnswer: false,
+                });
+            }
+            if (response2.value != "" && url2.value != "") {
+                respostas.push({
+                    text: response2.value,
+                    image: url2.value,
+                    isCorrectAnswer: false,
+                });
+            }
+            if (response3.value != "" && url3.value != "") {
+                respostas.push({
+                    text: response3.value,
+                    image: url3.value,
+                    isCorrectAnswer: false,
+                });
+            }
+            const question = {
+                title: pergunta.value,
+                color: cor.value,
+                answers: respostas,
+            }
+            questions.push(question);
+            validadores.push(true);
+        } else {
+            validadores.push(false);
         }
-        if (resposta2 != null && resposta2 != "" && url2 != null && url2 != "") {
-            respostas.push({
-                texto: resposta2,
-                image: url2,
-                isCorrectAnswer: false
-            });
-        }
-        if (resposta3 != null && resposta3 != "" && url3 != null && url3 != "") {
-            respostas.push({
-                texto: resposta3,
-                image: url3,
-                isCorrectAnswer: false
-            });
-        }
-        const question = {
-            title: pergunta,
-            color: cor,
-            answers: respostas,
-        };
-        quizzCriadoObj.questions.push(question);
+    }
+    if (validadores.indexOf(false) == -1) {
+        quizzCriadoObj.questions = questions;
         console.log(quizzCriadoObj);
-        renderFormNiveisQuizz(qtdNiveis);
+        renderFormNiveisQuizz();
     } else {
-        alert("Você preencheu um ou mais campos de forma errada!");
+        alert("Ops! Um ou mais campos foram preenchidos de forma errada!");
     }
 }
 
-//validações perguntas criaçao de quizz
-function questionIsValid(texto) {
-    if (texto != null && texto != "")
-        return true;
-    return false;
-}
 
 //Verifica se todas as respostas erradas sao validas
 function verifyWrongAnswers(texto1, url1, texto2, url2, texto3, url3) {
     const wronAnswersValidations = [wrongAnswerIsValid(texto1, url1), wrongAnswerIsValid(texto2, url2), wrongAnswerIsValid(texto3, url3),];
-    if (wronAnswersValidations.indexOf(false) == -1 && (
-        (questionIsValid(texto1) && urlIsValid(url1)) ||
-        (questionIsValid(texto2) && urlIsValid(url2)) ||
-        (questionIsValid(texto3) && urlIsValid(url3)))) { //verifica se nao existe valor false e se ao menos 1 dos true é diferente de vazio
+    if (wronAnswersValidations.indexOf(false) == 1) {
+        //verifica se nao existe valor false e se ao menos 1 dos true é diferente de vazio
+        return false;
+    } else if ((!answerIsValid(texto1) || !urlIsValid(url1)) &&
+        (!answerIsValid(texto2) || !urlIsValid(url2)) &&
+        (!answerIsValid(texto3) || !urlIsValid(url3))) {
+        removeErrorText(texto1);
+        removeErrorText(url1);
+        removeErrorText(texto2);
+        removeErrorText(url2);
+        removeErrorText(texto3);
+        removeErrorText(url3);
+        addErrorText(texto1, "Você deve preencher ao menos 1 resposta");
+        addErrorText(url1, "Você deve preencher ao menos 1 resposta");
+        return false;
+    } else {
         return true;
     }
-    return false;
+
 }
 
 //Essa aqui verifica pq as respostas erradas podem ser válidas mesmo nao existindo
 //Mas essa condiçao so existe se o texto e url forem iguais, ou seja
 //Ou ambos sao válidos ou ambos sao inválidos, o que muda é que ao menos 1 deve ser ambos válidos
-function wrongAnswerIsValid(texto, url) {
-    if ((questionIsValid(texto) && urlIsValid(url)) || (!questionIsValid(texto) && !urlIsValid(url)))
-        return true;
-    return false;
+function wrongAnswerIsValid(textoInput, urlInput) {
+    removeErrorText(textoInput);
+    removeErrorText(urlInput);
+    if (answerIsValid(textoInput) != urlIsValid(urlInput)) {
+        if (!answerIsValid(textoInput)) {
+            removeErrorText(textoInput);
+            addErrorText(textoInput, "Preencha ambos os campos!");
+        }
+        if (!urlIsValid(urlInput)) {
+            removeErrorText(urlInput);
+            addErrorText(urlInput, "Preencha ambos os campos!");
+        }
+        return false;
+    }
+    removeErrorText(textoInput);
+    removeErrorText(urlInput);
+    return true;
 }
 
 function correctAnswerIsValid(texto, url) {
-    if (questionIsValid(texto) && urlIsValid(url))
+    if (answerIsValid(texto) && urlIsValid(url))
         return true;
     return false;
 }
 
-function colorIsValid(cor) {
-    if (cor.match(colorRegex))
-        return true;
-    return false;
+function returnErrorDiv(textoDeErro) {
+    const element = document.createElement('div');
+    element.classList.add('error-text');
+    element.innerText = textoDeErro;
+    return element;
 }
 
 //validações info basicas criaçao de quizz
-function tituloIsValid(titulo) {
-    if (titulo != null)
+function tituloIsValid(tituloInput) {
+    removeErrorText(tituloInput);
+    if (tituloInput.value == null || tituloInput.value == "") {
+        addErrorText(tituloInput, "Preencha o campo!");
+        return false;
+    } else if (tituloInput.value.length < 20 || tituloInput.value.length > 65) {
+        addErrorText(tituloInput, "O titulo deve ter entre 20 e 65 caracteres!");
+        return false;
+    } else {
         return true;
-    return false;
+    }
 }
 
-function urlIsValid(url) {
-    if (url.match(urlRegex))
-        return true;
-    return false;
+function addErrorText(element, text) {
+    const elementPai = element.parentNode;
+    element.classList.add("error-input");
+    element.style.marginBottom = "5px";
+    elementPai.append(returnErrorDiv(text));
 }
 
-function qtdPerguntasIsValid(qtdPerguntas) {
-    if (qtdPerguntas >= 3)
-        return true;
-    return false;
+//deve passar o input que esteja dentro de uma div!!!
+function removeErrorText(element) {
+    const elementPai = element.parentNode;
+    if (elementPai.children.length > 1) {
+        element.style.marginBottom = "10px";
+        element.classList.remove("error-input");
+        elementPai.removeChild(elementPai.lastChild);
+    }
 }
 
-function qtdNiveisIsValid(qtdNiveis) {
-    if (qtdNiveis >= 2)
+function urlIsValid(urlInput) {
+    removeErrorText(urlInput);
+    if (!urlInput.value.match(urlRegex)) {
+        addErrorText(urlInput, "Insira uma url válida!");
+        return false;
+    } else if (urlInput.value == "") {
+        addErrorText(urlInput, "Insira uma url!");
+        return false;
+    } else {
         return true;
-    return false;
+    }
 }
+
+function qtdPerguntasIsValid(qtdPerguntasInput) {
+    removeErrorText(qtdPerguntasInput);
+    if (qtdPerguntasInput.value < 3) {
+        addErrorText(qtdPerguntasInput, "O número de perguntas deve ser maior do que 2!");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function qtdNiveisIsValid(qtdNiveisInput) {
+    removeErrorText(qtdNiveisInput);
+    if (qtdNiveisInput.value < 2) {
+        addErrorText(qtdNiveisInput, "O número de níveis deve ser maior do que 1!");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+function abrirElemento(elemento) {
+    let div = elemento.parentNode;
+    let form = div.parentNode;
+    let listaesc = form.querySelector(".hide-questions");
+    listaesc.classList.toggle('hidden');
+}
+
+//validações perguntas criaçao de quizz
+function questionIsValid(titleInput) {
+    removeErrorText(titleInput);
+    if (titleInput.value == null || titleInput.value == "") {
+        addErrorText(titleInput, "Informe o título!");
+        return false;
+    } else if (titleInput.value.length < 20) {
+        addErrorText(titleInput, "O título deve ter mais do que 20 caracteres!");
+        return false;
+    }
+    return true;
+}
+
+function answerIsValid(titleInput) {
+    removeErrorText(titleInput);
+    if (titleInput.value == null || titleInput.value == "") {
+        addErrorText(titleInput, "Informe o título!");
+        return false;
+    }
+    return true;
+}
+
+
+function colorIsValid(corInput) {
+    removeErrorText(corInput);
+    if (!corInput.value.match(colorRegex)) {
+        addErrorText(corInput, "Insira uma cor válida!")
+        return false;
+    }
+    return true;
+}
+
+function validarNivel(titulo, acertos, url, descricao) {
+    if (tituloNivelisValid(titulo) && acertoIsValid(acertos) && urlIsValid(url) && descricaoNivelisValid(descricao)) {
+        contador++
+    }
+}
+
+function tituloNivelisValid(titulo) {
+    if (titulo.length > 10) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function acertoIsValid(acertos) {
+    const percAcertos = Number(acertos);
+    if (percAcertos >= 0 && percAcertos <= 100) {
+        if (percAcertos === 0) {
+            contadorNiveis++;
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function descricaoNivelisValid(titulo) {
+    if (titulo.length > 30) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function submitAll() {
+    const forms = document.forms;
+    for (let i = 0; i < forms.length; i++) {
+        const formValido = forms[i].reportValidity();
+        if (formValido) {
+            forms[i].submit();
+        }
+    }
+}
+
+function submitAllNiveis() {
+    const forms = document.forms;
+    contador = 0;
+    for (let i = 0; i < forms.length; i++) {
+        const formValido = forms[i].reportValidity();
+        if (formValido) {
+            forms[i].submit();
+        }
+    }
+    if (contador === (forms.length - 1) && contadorNiveis >= 1) {
+        //aqui vai renderizar a proxima etapa das perguntas
+    }
+    else {
+        alert("Você preencheu os dados de forma errada, preencha novamente!");
+    }
+}
+
+
+iniciarBuzzQuizz();
