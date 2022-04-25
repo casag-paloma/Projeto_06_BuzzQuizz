@@ -1,14 +1,16 @@
 const API_URL = 'https://mock-api.driven.com.br/api/v6/buzzquizz';
 const RECURSO_QUIZZES_URL = '/quizzes'; //Aceita GET e POST
-
-let qtdPerguntas;
-let qtdNiveis;
-
 //regex para garantir que o q foi passado é um url válido
 const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/gm;
 const colorRegex = /^#[a-fA-F0-9]{6}/;
 
-renderFormInfoBasicaQuizz();
+let qtdPerguntas;
+let qtdNiveis;
+let idsQuizzesUsuario = []; //Lista com os IDS de quizzes do usuário
+
+let quizzes;
+let quizzesUsuario;
+
 /*
     O quizz criado se refere ao quizz q está sendo criado
     Ao longo dos formulários, ele será preenchido com as informaçoes
@@ -32,21 +34,37 @@ renderFormInfoBasicaQuizz();
 const quizzCriadoObj = {};
 
 function iniciarBuzzQuizz() {
-    document.querySelector("main").innerHTML = `
-    <div class="usuario">
-            <div class="text">
-                Você não criou nenhum quizz ainda :(
-            </div>
-            <button onclick="renderFormInfoBasicaQuizz()"> Criar Quizz</button>
-        </div>`;
-
+    document.querySelector("main").innerHTML = "";
     getQuizzes();
+    getQuizzesUsuario();
 }
 
+function isUserQuizz(quizz) {
+    return idsQuizzesUsuario.includes(quizz.id);
+}
+
+function isntUserQuizz(quizz) {
+    return idsQuizzesUsuario.indexOf(quizz.id) == -1
+}
 
 //requisiçoes
 function getQuizzes() {
     const promise = axios.get(API_URL + RECURSO_QUIZZES_URL);
+    promise.then((response) => {
+        const listQuizzes = response.data.map(quizzConstructor);
+        quizzesUsuario = listQuizzes.filter(isUserQuizz);
+        quizzes = listQuizzes.filter(isntUserQuizz);
+        renderListQuizzesUsuario(quizzes);
+        renderListQuizzes(quizzes);
+    });
+    promise.then((error) => {
+        console.log(error);
+    });
+}
+
+//requisiçoes
+function saveQuizz() {
+    const promise = axios.post(API_URL + RECURSO_QUIZZES_URL);
     promise.then((response) => {
         const listQuizzes = response.data.map(quizzConstructor);
         renderListQuizzes(listQuizzes);
@@ -56,24 +74,33 @@ function getQuizzes() {
     });
 }
 
+function getQuizzesUsuario() {
+    const quizzesUsuario = localStorage.getItem("idsQuizzes");
+    idsQuizzesUsuario = JSON.parse(quizzesUsuario) ?? [];
+}
+
+function setQuizzesUsuario() {
+    const quizzesUsuarioString = JSON.stringify(idsQuizzesUsuario);
+    localStorage.setItem("idsQuizzes", quizzesUsuarioString);
+}
+
 //Navegação =======================================
 //finalização da criação do quizz
 function onTapBackHome() {
-    console.log("Voltou home");
-    //TODO criar funcao de renderizar
-    //TODO: adicionar na lista de quizzes do usuário
+    iniciarBuzzQuizz();
 }
 
 //Aqui recebe o quizz(index no array, id ou objeto) como parametro para renderizar na tela
 function onTapQuizz(quizz) {
     //TODO: criar funcao de renderizar
+    document.querySelector("main").innerHTML = `${quizz.image}`;
 }
 
 //TELA PRINCIPAL =======================================
 function renderListQuizzes(quizzes) {
     const quizzesList = `
         <div>
-            <span class="title-text-field">Todos os quizzes</span>
+            <div class="title-list-content"><span class="title-list">Todos os quizzes</span></div>
             <div class="lista-quizzes">
             </div>
         </div>
@@ -82,24 +109,62 @@ function renderListQuizzes(quizzes) {
     quizzes.map(renderCardQuizzLista);
 }
 
+function renderListQuizzesUsuario(quizzes) {
+    let quizzesList;
+    if (quizzes.length == 0) {
+        quizzesList = `
+            <div class="usuario">
+                    <div class="text">
+                        Você não criou nenhum quizz ainda :(
+                    </div>
+                    <button onclick="renderFormInfoBasicaQuizz()"> Criar Quizz</button>
+                </div>`;
+    } else {
+        quizzesList = `
+            <div>
+                <div class="title-list-content"><span class="title-list" style="width:auto">Seus quizzes</span> <div class="add-button" onclick="renderFormInfoBasicaQuizz()"><ion-icon name="add-outline"></ion-icon></div></div>
+                <div class="lista-quizzes-usuario">
+                </div>
+            </div>`;
+    }
 
-
-function renderCardQuizzLista(quizz) {
-    const cardQuizz = `<div class="card-quizz" onclick="onTapQuizz('${quizz}')">
-            <img src="${quizz.image}"
-                alt="Imagem de exibição do Quizz">
-            <div class="degrade-card-quizz"></div>
-            <span>${quizz.title}</span>
-        </div>`;
-    document.querySelector(".lista-quizzes").innerHTML += cardQuizz;
+    document.querySelector("main").innerHTML += quizzesList;
+    quizzes.map(renderCardQuizzListaUsuario);
 }
 
 
+
+function renderCardQuizzLista(quizz) {
+    const cardQuizz = document.createElement("div");
+    cardQuizz.setAttribute("class", "card-quizz");
+    cardQuizz.setAttribute("onclick", `onTapQuizz('${quizz}')`);
+    cardQuizz.innerHTML = `<img src="${quizz.image}"
+                alt="Imagem de exibição do Quizz">
+            <div class="degrade-card-quizz"></div>
+            <span>${quizz.title}</span>`;
+
+    const element = document.querySelector(".lista-quizzes");
+    element.append(cardQuizz);
+}
+
+function renderCardQuizzListaUsuario(quizz) {
+    const cardQuizz = document.createElement("div");
+    cardQuizz.setAttribute("class", "card-quizz");
+    cardQuizz.setAttribute("onclick", `onTapQuizz('${quizz}')`);
+    cardQuizz.innerHTML = `<img src="${quizz.image}"
+                alt="Imagem de exibição do Quizz">
+            <div class="degrade-card-quizz"></div>
+            <span>${quizz.title}</span>`;
+
+    const element = document.querySelector(".lista-quizzes-usuario");
+    element.append(cardQuizz);
+}
 
 //Construtores ================================
 //construtores recebem um mapa como parametro e retornam o objeto
 function quizzConstructor(quizzData) {
     const quizz = {};
+    quizz.id = quizzData.id;
     quizz.title = quizzData.title;
     quizz.image = quizzData.image;
     quizz.questions = quizzData.questions.map(questionConstructor);
