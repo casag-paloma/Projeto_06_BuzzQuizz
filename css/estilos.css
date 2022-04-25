@@ -14,7 +14,9 @@ body,
 button,
 .usuario,
 input,
-input::placeholder {
+input::placeholder,
+.banner
+.perguntas {
     font-family: 'Roboto',
         'sans-serif';
 }
@@ -80,7 +82,7 @@ form {
     font-size: 23px;
 }
 
-.title-text-field {
+.fields >.title-text-field {
     font-size: 20px;
     width: 100%;
     text-align: start;
@@ -315,6 +317,95 @@ main>div {
     display: none;
 }
 
+/* PÁGINA DE UM QUIZZ  */
+
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.banner{
+    width: 100%;
+    height: 227px;
+    position: relative;
+    margin-bottom: 42px;
+}
+
+.banner>img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner>.opaco{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    top:0;
+    left: 0;
+}
+
+.opaco > span{
+    font-weight: 400;
+    font-size: 39px;
+    line-height: 46px;
+    color: #FFFFFF;
+    opacity: 1;
+}
+
+.perguntas{
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 759px;
+    height: 676px;
+    box-sizing: border-box;
+    padding: 28px 36px;
+}
+
+.perguntas>div{
+    background-color: blue;
+    width: 688px;
+    height: 138px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+
+}
+
+.perguntas>div>p{
+    font-weight: 700;
+    font-size: 23px;
+    line-height: 27px;
+    color: #FFFFFF;
+}
+
+.opcoes{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.opcao>img{
+    width: 330px;
+    height: 175px;
+    object-fit: fill;
+}
+
+.opcao>div{
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 23px;
+    color: #000000;
+    margin: 2px auto 18px auto;
+}
 /*Para os boxes com error*/
 .error-input {
     background-color: #FFE9E9;

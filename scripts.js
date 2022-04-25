@@ -11,6 +11,11 @@ let idsQuizzesUsuario = []; //Lista com os IDS de quizzes do usuário
 let quizzes;
 let quizzesUsuario;
 
+function comparador() { 
+	return Math.random() - 0.5; 
+}
+
+
 /*
     O quizz criado se refere ao quizz q está sendo criado
     Ao longo dos formulários, ele será preenchido com as informaçoes
@@ -52,9 +57,10 @@ function getQuizzes() {
     const promise = axios.get(API_URL + RECURSO_QUIZZES_URL);
     promise.then((response) => {
         const listQuizzes = response.data.map(quizzConstructor);
+        console.log(listQuizzes);
         quizzesUsuario = listQuizzes.filter(isUserQuizz);
         quizzes = listQuizzes.filter(isntUserQuizz);
-        renderListQuizzesUsuario(quizzes);
+        renderListQuizzesUsuario(quizzesUsuario);
         renderListQuizzes(quizzes);
     });
     promise.then((error) => {
@@ -64,7 +70,7 @@ function getQuizzes() {
 
 //requisiçoes
 function saveQuizz() {
-    const promise = axios.post(API_URL + RECURSO_QUIZZES_URL);
+    const promise = axios.post(API_URL + RECURSO_QUIZZES_URL, quizzCriadoObj);
     promise.then((response) => {
         const listQuizzes = response.data.map(quizzConstructor);
         renderListQuizzes(listQuizzes);
@@ -92,9 +98,13 @@ function onTapBackHome() {
 
 //Aqui recebe o quizz(index no array, id ou objeto) como parametro para renderizar na tela
 function onTapQuizz(quizz) {
-    //TODO: criar funcao de renderizar
-    document.querySelector("main").innerHTML = `${quizz.image}`;
+    console.log(quizz);
+    renderPageQuizz(quizz);
 }
+
+renderPageQuizz(quizz){
+}
+
 
 //TELA PRINCIPAL =======================================
 function renderListQuizzes(quizzes) {
@@ -137,7 +147,9 @@ function renderListQuizzesUsuario(quizzes) {
 function renderCardQuizzLista(quizz) {
     const cardQuizz = document.createElement("div");
     cardQuizz.setAttribute("class", "card-quizz");
-    cardQuizz.setAttribute("onclick", `onTapQuizz('${quizz}')`);
+    cardQuizz.addEventListener("click", function(){
+        onTapQuizz(quizz);
+    });
     cardQuizz.innerHTML = `<img src="${quizz.image}"
                 alt="Imagem de exibição do Quizz">
             <div class="degrade-card-quizz"></div>
@@ -209,22 +221,27 @@ function abrirElemento(elemento) {
 }
 
 //Renderização visual
-function renderCardQuizzCricao(quizz) {
-    const cardQuizz = `<div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
-            <img src="${quizz.image}"
-                alt="Imagem de exibição do Quizz">
-            <div class="degrade-card-quizz"></div>
-            <span>${quizz.title}</span>
-        </div>`;
-    document.querySelector(".lista-quizzes").innerHTML += cardQuizz;
-}
+//function renderCardQuizzCricao(quizz) {
+  //  const cardQuizz = `<div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
+   //         <img src="${quizz.image}"
+    //            alt="Imagem de exibição do Quizz">
+      //      <div class="degrade-card-quizz"></div>
+        //    <span>${quizz.title}</span>
+       // </div>`;
+    //document.querySelector(".lista-quizzes").innerHTML += cardQuizz;
+//}
 
 //Aqui recebe o objeto do quizz como parametro pra já renderizar com as informaçoes corretas
 function renderQuizzCreated(quizz) {
-    const quizzToRender = `<div class="title-form">Seu quizz está pronto!</div>
-        ${renderCardQuizzCricao(quizz)}
-        <button class="btn-criar" onclick="onTapQuizz()">Acessar Quizz</button>
-        <span class="sub-text" onclick="onTapBackHome()">Voltar pra home</span>`;
+    const quizzToRender = `
+    <div class="title-form">Seu quizz está pronto!</div>
+    <div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
+        <img src="${quizz.image}" alt="Imagem de exibição do Quizz">
+        <div class="degrade-card-quizz"></div>
+        <span>${quizz.title}</span>
+    </div>
+    <button class="btn-criar" onclick="onTapQuizz()">Acessar Quizz</button>
+    <span class="sub-text" onclick="onTapBackHome()">Voltar pra home</span>`;
 
     const divMain = document.querySelector("main");
     divMain.innerHTML = quizzToRender;
@@ -247,43 +264,13 @@ function renderFormInfoBasicaQuizz() {
 }
 
 
-
-function renderFormNiveisQuizz() {
-    let niveis = "";
-    for (let i = 0; i < qtdNiveis; i++) {
-        niveis += `
-        <form action='javascript:validarNivel(titleLevel.value, %right.value, urlLevel.value, descriptionLevel.value)'>
-            <div class="fields">
-                <div class="title-text-field">Nivel ${i + 1}  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>                
-                <div class="hide-questions hidden">
-                    <input class="text-field" id="titleLevel" type="text" minlength="10" placeholder="Título do nível">
-                    <input class="text-field" id="%right" type="number" placeholder="% de acerto mínima" minlength="0" maxlength="100">
-                    <input class="text-field" id="urlLevel" type="url" placeholder="Url da imagem do nível ">
-                    <input class="text-field" id="descriptionLevel" type="text" placeholder="Descrição do nível" minlength="30" >
-                </div>
-            </div>
-        </form>`
-    }
-
-    const form = `<div class="title-form">Agora, decida os níveis</div>
-    <div>
-        <form action='javascript:validarNivel(titleLevel.value, %right.value, urlLevel.value, descriptionLevel.value)'>
-        </form>
-        ${niveis}
-        <button type="submit" onclick = "submitAll()"class="btn-criar">Finalizar Quizz</button>`;
-
-    const divMain = document.querySelector("main");
-    divMain.innerHTML = form;
-}
-
-// Formulário de Criação de Perguntas - tela 3.2
 function renderFormPerguntasQuizz() {
     let perguntas = "";
     for (let i = 0; i < qtdPerguntas; i++) {
         perguntas += `
         <form action='javascript:validarPerguntas()'>
             <div class="fields">
-                <div class="title-text-field">Pergunta ${i + 1}  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>
+                <div class="title-text-field"> <span> Pergunta ${i + 1} </span>  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>
                 <div class="hide-questions ${i != 0 ? 'hidden' : ''}">
                     <div><input class="text-field" name="titleQuestion${i + 1}" type="text" placeholder="Texto da pergunta"></div>    
                     <div><input class="text-field" name="colorQuestion${i + 1}" type="text" placeholder="Cor de fundo da pergunta (#FFFFFF)"></div>
@@ -306,11 +293,56 @@ function renderFormPerguntasQuizz() {
     const form = `<div class="title-form">Crie suas perguntas</div>
     <div>
         ${perguntas}
-        <button type="submit" onclick = "submitAll()" class="btn-criar">Prosseguir para criar níveis</button>
+        <button type="submit" class="btn-criar">Prosseguir para criar níveis</button>
     </div>`;
     const divMain = document.querySelector("main");
     divMain.innerHTML = form;
 }
+
+function renderFormNiveisQuizz() {
+    let niveis = "";
+
+    for (let i = 0; i < qtdNiveis; i++) {
+
+        if(i===0){
+            niveis += `
+            <div class="fields">
+                <div class="title-text-field"> Nivel ${i + 1}</div>                
+                <div>
+                    <input class="text-field" name="titleLevel${i + 1}" type="text" placeholder="Título do nível">
+                    <input class="text-field" name="percRight${i + 1}" type="number" placeholder="% de acerto mínima">
+                    <input class="text-field" name="urlLevel${i + 1}" type="url" placeholder="Url da imagem do nível ">
+                    <input class="text-field" name="descriptionLevel${i + 1}" type="text" placeholder="Descrição do nível">
+                </div>
+            </div>
+        `
+
+        } else{
+            niveis += `
+                <div class="fields">
+                    <div class="title-text-field"> <span> Nivel ${i + 1} </span>  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>                
+                    <div class="hide-questions hidden">
+                    <input class="text-field" name="titleLevel${i + 1}" type="text" placeholder="Título do nível">
+                    <input class="text-field" name="percRight${i + 1}" type="number" placeholder="% de acerto mínima">
+                    <input class="text-field" name="urlLevel${i + 1}" type="url" placeholder="Url da imagem do nível ">
+                    <input class="text-field" name="descriptionLevel${i + 1}" type="text" placeholder="Descrição do nível">
+                    </div>
+                </div>
+            `
+        }
+    }
+
+    const form = `<div class="title-form">Agora, decida os níveis</div>
+    <div>
+        <form action='javascript:validarNivel()'>
+            ${niveis}
+            <button type="submit" class="btn-criar">Finalizar Quizz</button>
+        </form>`;
+
+    const divMain = document.querySelector("main");
+    divMain.innerHTML = form;
+}
+
 
 
 
@@ -326,7 +358,7 @@ function validarFormInfoBasica() {
         quizzCriadoObj.image = listaInputs[1].value;
         qtdPerguntas = listaInputs[2].value;
         qtdNiveis = listaInputs[3].value;
-        renderFormPerguntasQuizz();
+        renderFormNiveisQuizz();
     }
 }
 
@@ -568,14 +600,58 @@ function colorIsValid(corInput) {
     return true;
 }
 
-function validarNivel(titulo, acertos, url, descricao) {
-    if (tituloNivelisValid(titulo) && acertoIsValid(acertos) && urlIsValid(url) && descricaoNivelisValid(descricao)) {
-        contador++
+
+let levels;
+
+function validarNivel() {
+    const validadores = [];
+    let levels = [];
+    const element = document.querySelectorAll(".fields");
+    console.log(element);
+    for (let index = 0; index < element.length; index++) {
+        const field = element[index];
+        const titulo = field.querySelector(`[name="titleLevel${index + 1}"]`);
+        const url = field.querySelector(`[name="urlLevel${index + 1}"]`);
+        const texto = field.querySelector(`[name="descriptionLevel${index + 1}"]`);
+        const acertos = field.querySelector(`[name="percRight${index + 1}"]`);
+        
+       
+        const _titleLevelIsValid = tituloNivelisValid(titulo);
+        const _percRightIsValid = acertoIsValid(acertos);
+        const _descriptionIsValid = descricaoNivelisValid(texto);
+        const _urlIsValid = urlIsValid(url);
+
+        if (_titleLevelIsValid && _percRightIsValid && _descriptionIsValid && _urlIsValid) {
+            levels.push({
+                title: titulo.value,
+                image: url.value,
+                text: texto.value,
+                minValue: Number((acertos.value))
+            });
+            validadores.push(true);
+        } else {
+            validadores.push(false);
+        }
+ 
     }
+    const minValues = levels.filter(temZero);
+
+    if (validadores.indexOf(false) == -1 && minValues.length >= 1) {
+        quizzCriadoObj.levels = levels;
+        console.log(quizzCriadoObj);
+        //finalizar e mandar o quizz pro sistema 
+        //saveQuizz();
+        renderQuizzCreated(quizzCriadoObj);
+
+        console.log('deucerto');
+    } else {
+        alert("Ops! Um ou mais campos foram preenchidos de forma errada!");
+    }
+
 }
 
 function tituloNivelisValid(titulo) {
-    if (titulo.length > 10) {
+    if ((titulo.value).length > 10) {
         return true;
     } else {
         return false;
@@ -583,51 +659,34 @@ function tituloNivelisValid(titulo) {
 }
 
 function acertoIsValid(acertos) {
-    const percAcertos = Number(acertos);
-    if (percAcertos >= 0 && percAcertos <= 100) {
-        if (percAcertos === 0) {
-            contadorNiveis++;
+
+    if(acertos.value === ""){
+        return false
+    } else{
+        const percAcertos = Number(acertos.value);
+        if (percAcertos >= 0 && percAcertos <= 100) {
+            return true;
+        } else {
+            return false;
         }
+
+    }
+}
+
+function descricaoNivelisValid(texto) {
+    if ((texto.value).length > 30) {
         return true;
     } else {
         return false;
     }
 }
 
-function descricaoNivelisValid(titulo) {
-    if (titulo.length > 30) {
-        return true;
-    } else {
-        return false;
+function temZero(elemento){
+    if(elemento.minValue === 0){
+        return true
+    } else{
+        return false
     }
 }
-
-function submitAll() {
-    const forms = document.forms;
-    for (let i = 0; i < forms.length; i++) {
-        const formValido = forms[i].reportValidity();
-        if (formValido) {
-            forms[i].submit();
-        }
-    }
-}
-
-function submitAllNiveis() {
-    const forms = document.forms;
-    contador = 0;
-    for (let i = 0; i < forms.length; i++) {
-        const formValido = forms[i].reportValidity();
-        if (formValido) {
-            forms[i].submit();
-        }
-    }
-    if (contador === (forms.length - 1) && contadorNiveis >= 1) {
-        //aqui vai renderizar a proxima etapa das perguntas
-    }
-    else {
-        alert("Você preencheu os dados de forma errada, preencha novamente!");
-    }
-}
-
 
 iniciarBuzzQuizz();
