@@ -366,6 +366,7 @@ main>div {
     height: 676px;
     box-sizing: border-box;
     padding: 28px 36px;
+    margin-bottom: 42px;
 }
 
 .perguntas>div {
@@ -404,6 +405,24 @@ main>div {
     line-height: 23px;
     color: #000000;
     margin: 2px auto 18px auto;
+    word-break: break-all;
+}
+
+
+.clicadas{
+    opacity: 0.3;
+}
+
+.escolhida{
+    opacity: 1;
+}
+
+.clicadas > .certa {
+    color: #009C22;
+}
+
+.clicadas > .errada {
+    color:#FF4B4B;
 }
 
 /*Isso aqui faz a caixinha de resultado!!*/

@@ -102,20 +102,11 @@ function onTapBackHome() {
 
 //Aqui recebe o quizz(index no array, id ou objeto) como parametro para renderizar na tela
 function onTapQuizz(quizz) {
-    console.log(quizz);
-    
     renderPageQuizz(quizz);
 }
 
 function renderPageQuizz(quizz){
-    console.log(quizz);
-    console.log(quizz.title);
-    console.log(quizz.image);
-
-    console.log(quizz.questions.length);
-
-
-
+    
     let paginaQuizz = "";
     let caixaPergunta = [];
 
@@ -129,35 +120,44 @@ function renderPageQuizz(quizz){
     `
     for(let i = 0; i < quizz.questions.length; i++){
         let pergunta = quizz.questions;
-        let respostas= {};
+        let respostas= "";
 
-        console.log(pergunta);
+        console.log(pergunta[i].answers.length);
+        let resposta = pergunta[i].answers;
+        console.log(resposta);
+        let respostaAleat = resposta;
+        console.log(respostaAleat);
+
         for(let j = 0; j < pergunta[i].answers.length; j++){
-            
-            let resposta = pergunta[i].answers;
-            let respostaAleatoria = resposta.sort(comparador);
-            
-            if(respostaAleatoria[j].isCorrectAnswer){
-                respostas += `<li class="opcao certa">
+        
+            if(respostaAleat[j].isCorrectAnswer){
+                console.log("resposta certa")
+                respostas += `
+                    <li class="opcao " onclick="chooseOption(this)">
                         <img src=${resposta[j].image} alt="">
-                        <div>${resposta[j].text}</div>
+                        <div class= "certa">${resposta[j].text}</div>
                     </li>`
+
             } else{
-                respostas += `<li class="opcao errada">
+                console.log("peee, errada");
+                respostas += `
+                    <li class="opcao " onclick="chooseOption(this)">
                         <img src=${resposta[j].image} alt="">
-                        <div>${resposta[j].text}</div>
-                    </li>`
+                        <div class="errada">${resposta[j].text}</div>
+                    </li>`;
             }
 
-            caixaPergunta += `
-            <div class="perguntas" >
-            <div style="background-color:${pergunta[i].color};"> <p>${pergunta[i].title}</p></div>
-            <ul class="opcoes">
-                ${respostas}
-            </ul>
-        </div>
-        `
         }
+        
+        caixaPergunta += `
+                <div class="perguntas" >
+                    <div style="background-color:${pergunta[i].color};"> <p>${pergunta[i].title}</p></div>
+                    <ul class="opcoes">
+                        ${respostas}
+                    </ul>
+                </div> `;
+        
+    }
 
     const divMain = document.querySelector("main");
     divMain.innerHTML = '';
@@ -165,12 +165,29 @@ function renderPageQuizz(quizz){
     const divContainer = document.querySelector(".container");
     divContainer.innerHTML = topoQuizz + caixaPergunta;
 
+    scrollToTop();
+  
+}
 
 
+function chooseOption(elemento){
+    console.log(elemento);
+    let lista = elemento.parentNode;
+    let pergunta = elemento.parentNode;
+
+    if(pergunta.querySelector(".escolhida") === null){
+        //elemento.classList.add("escolhida");
+        console.log(lista)
+        let listaOpcoes = lista.querySelectorAll("li");
+        console.log(listaOpcoes);
+        for (let i = 0; i < listaOpcoes.length; i++ ) {
+            listaOpcoes[i].classList.add("clicadas");
+        }
+        
+        elemento.classList.add("escolhida");
+    }
     
 }
-}
-
 
 //TELA PRINCIPAL =======================================
 function renderListQuizzes(quizzes) {
