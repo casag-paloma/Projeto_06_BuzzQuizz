@@ -9,12 +9,12 @@ let qtdNiveis;
 let idsQuizzesUsuario = []; //Lista com os IDS de quizzes do usuário
 
 let quizzes;
-let quizzesUsuario;
+let quizzesUsuario = [];
 
 //perguntas e respostas - lista de objetos
 let perguntas;
 let qtdAcertos = 0;
-
+let currentQuizz;
 
 
 function comparador() {
@@ -45,20 +45,20 @@ function comparador() {
 const quizzCriadoObj = {};
 
 function iniciarBuzzQuizz() {
+    quizzesUsuario = [];
+    scrollToTop();
+    document.querySelector(".container").innerHTML = "";
     document.querySelector("main").innerHTML = "";
     getQuizzesUsuario();
     getQuizzes();
 }
 
-function isUserQuizz(quizz) {
-    console.log(quizz.id);
-    console.log(idsQuizzesUsuario);
-    console.log(idsQuizzesUsuario.includes(quizz.id));
-    return idsQuizzesUsuario.includes(quizz.id.toString());
+function isUserQuizz(quizz) {   
+    return idsQuizzesUsuario.includes(quizz.id);
 }
 
 function isntUserQuizz(quizz) {
-    return idsQuizzesUsuario.indexOf(quizz.id.toString()) == -1
+    return idsQuizzesUsuario.indexOf(quizz.id) == -1;
 }
 
 //requisiçoes
@@ -67,6 +67,7 @@ function getQuizzes() {
     promise.then((response) => {
         const listQuizzes = response.data.map(quizzConstructor);
         quizzesUsuario = listQuizzes.filter(isUserQuizz);
+
         quizzes = listQuizzes.filter(isntUserQuizz);
         renderListQuizzesUsuario(quizzesUsuario);
         renderListQuizzes(quizzes);
@@ -74,6 +75,24 @@ function getQuizzes() {
     promise.then((error) => {
         console.log(error);
     });
+}
+
+function loadQuizzesUsuario(){
+    if(idsQuizzesUsuario.length > 0){
+        idsQuizzesUsuario.map((id) => {
+            const promise = axios.get(API_URL + RECURSO_QUIZZES_URL + "/" + id);
+            promise.then((response) => {
+                const quizzUsuario = quizzConstructor(response.data);
+                if(quizzesUsuario == null){
+                    quizzesUsuario = [];
+                }
+                quizzesUsuario.push(quizzUsuario);
+                renderListQuizzesUsuario(quizzesUsuario);
+            });
+        });
+    }else{
+        renderListQuizzesUsuario(quizzesUsuario);
+    }
 }
 
 //requisiçoes
@@ -107,46 +126,40 @@ function onTapBackHome() {
 
 //Aqui recebe o quizz(index no array, id ou objeto) como parametro para renderizar na tela
 function onTapQuizz(quizz) {
+    scrollToTop();
     renderPageQuizz(quizz);
 }
 
 function renderPageQuizz(quizz){
-    
-    let paginaQuizz = "";
+    currentQuizz = quizz;
     let caixaPergunta = [];
 
-    let topoQuizz = `
-    <div class="banner">
+    let topoQuizz = `<div class="banner">
             <img src="${quizz.image}" alt="">
             <div class="opaco">
                 <span>${quizz.title}</span>
             </div>
-        </div>
-    `
+        </div>`;
+
+
     for(let i = 0; i < quizz.questions.length; i++){
         let pergunta = quizz.questions;
         let respostas= "";
-
-        console.log(pergunta[i].answers.length);
         let resposta = pergunta[i].answers;
-        console.log(resposta);
-        let respostaAleat = resposta;
-        console.log(respostaAleat);
-
-        for(let j = 0; j < pergunta[i].answers.length; j++){
+        let respostaAleatoria = resposta.sort(comparador);
         
-            if(respostaAleat[j].isCorrectAnswer){
-                console.log("resposta certa")
+        for(let j = 0; j < pergunta[i].answers.length; j++){
+            const isLast = i+1 == quizz.questions.length;
+            if(respostaAleatoria[j].isCorrectAnswer){
                 respostas += `
-                    <li class="opcao " onclick="chooseOption(this)">
+                    <li class="opcao" onclick="chooseOption(this); onTapRight(); onTapLast(${isLast}); scrollToNextQuestion(${isLast}, ${i});">
                         <img src=${resposta[j].image} alt="">
                         <div class= "certa">${resposta[j].text}</div>
                     </li>`
 
             } else{
-                console.log("peee, errada");
                 respostas += `
-                    <li class="opcao " onclick="chooseOption(this)">
+                    <li class="opcao" onclick="chooseOption(this); onTapLast(${isLast}); scrollToNextQuestion(${isLast}, ${i});">
                         <img src=${resposta[j].image} alt="">
                         <div class="errada">${resposta[j].text}</div>
                     </li>`;
@@ -161,7 +174,6 @@ function renderPageQuizz(quizz){
                         ${respostas}
                     </ul>
                 </div> `;
-        
     }
 
     const divMain = document.querySelector("main");
@@ -169,26 +181,27 @@ function renderPageQuizz(quizz){
 
     const divContainer = document.querySelector(".container");
     divContainer.innerHTML = topoQuizz + caixaPergunta;
-
-    scrollToTop();
-  
 }
 
+function scrollToNextQuestion(isLast, index){
+    if(!isLast){
+        const elements = document.querySelectorAll(".perguntas");
+        const proximaPergunta = elements[index+1];
+        setTimeout(() => {
+            proximaPergunta.scrollIntoView();
+        },2000);
+    }
+}
 
 function chooseOption(elemento){
-    console.log(elemento);
     let lista = elemento.parentNode;
     let pergunta = elemento.parentNode;
-
+    elemento.removeAttribute("onclick");
     if(pergunta.querySelector(".escolhida") === null){
-        //elemento.classList.add("escolhida");
-        console.log(lista)
         let listaOpcoes = lista.querySelectorAll("li");
-        console.log(listaOpcoes);
         for (let i = 0; i < listaOpcoes.length; i++ ) {
             listaOpcoes[i].classList.add("clicadas");
         }
-        
         elemento.classList.add("escolhida");
     }
     
@@ -222,10 +235,10 @@ function renderListQuizzesUsuario(quizzes) {
             <div style="width: 100%">
                 <div class="title-list-content"><span class="title-list" style="width:auto">Seus quizzes</span> <div class="add-button" onclick="renderFormInfoBasicaQuizz()"><ion-icon name="add-outline"></ion-icon></div></div>
                 <div class="lista-quizzes-usuario">
+
                 </div>
             </div>`;
     }
-
     document.querySelector("main").innerHTML += quizzesList;
     quizzes.map(renderCardQuizzListaUsuario);
 }
@@ -235,30 +248,34 @@ function renderListQuizzesUsuario(quizzes) {
 function renderCardQuizzLista(quizz) {
     const cardQuizz = document.createElement("div");
     cardQuizz.setAttribute("class", "card-quizz");
-    cardQuizz.addEventListener("click", function () {
-        onTapQuizz(quizz);
-    });
+    cardQuizz.onclick = () => onTapQuizz(quizz);
     cardQuizz.innerHTML = `<img src="${quizz.image}"
                 alt="Imagem de exibição do Quizz">
             <div class="degrade-card-quizz"></div>
             <span>${quizz.title}</span>`;
-            cardQuizz.classList.add("div-opaca");
-            cardQuizz.classList.add("right-answer");
     const element = document.querySelector(".lista-quizzes");
     element.append(cardQuizz);
+    teste();
 }
+
 
 function renderCardQuizzListaUsuario(quizz) {
     const cardQuizz = document.createElement("div");
     cardQuizz.setAttribute("class", "card-quizz");
-    cardQuizz.setAttribute("onclick", `onTapQuizz('${quizz}')`);
-    cardQuizz.innerHTML = `<img src="${quizz.image}"
+    cardQuizz.onclick = () => onTapQuizz(quizz);
+    cardQuizz.innerHTML += `<img src="${quizz.image}"
                 alt="Imagem de exibição do Quizz">
             <div class="degrade-card-quizz"></div>
             <span>${quizz.title}</span>`;
-    
     const element = document.querySelector(".lista-quizzes-usuario");
     element.append(cardQuizz);
+}
+
+function teste(){
+    const listaUser = document.querySelectorAll(".lista-quizzes-usuario .card-quizz");
+    for(let i=0; i<listaUser.length; i++){
+        listaUser[i].onclick = () => onTapQuizz(quizzesUsuario[i]);
+    }
 }
 
 //Construtores ================================
@@ -309,28 +326,19 @@ function abrirElemento(elemento) {
     listaEscondida.classList.toggle('hidden');
 }
 
-//Renderização visual
-//function renderCardQuizzCricao(quizz) {
-//  const cardQuizz = `<div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
-//         <img src="${quizz.image}"
-//            alt="Imagem de exibição do Quizz">
-//      <div class="degrade-card-quizz"></div>
-//    <span>${quizz.title}</span>
-// </div>`;
-//document.querySelector(".lista-quizzes").innerHTML += cardQuizz;
-//}
+
 
 //Aqui recebe o objeto do quizz como parametro pra já renderizar com as informaçoes corretas
 function renderQuizzCreated(quizz) {
     const quizzToRender = `
-    <div class="title-form">Seu quizz está pronto!</div>
-    <div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
-        <img src="${quizz.image}" alt="Imagem de exibição do Quizz">
-        <div class="degrade-card-quizz"></div>
-        <span>${quizz.title}</span>
-    </div>
-    <button class="btn-criar" onclick="onTapQuizz()">Acessar Quizz</button>
-    <span class="sub-text" onclick="onTapBackHome()">Voltar pra home</span>`;
+        <div class="title-form">Seu quizz está pronto!</div>
+        <div class="card-quizz criacao-card" onclick="onTapQuizz(${quizz})">
+            <img src="${quizz.image}" alt="Imagem de exibição do Quizz">
+            <div class="degrade-card-quizz"></div>
+            <span>${quizz.title}</span>
+        </div>
+        <button class="btn-criar" onclick="onTapQuizz()">Acessar Quizz</button>
+        <span class="sub-text" onclick="onTapBackHome()">Voltar pra home</span>`;
 
     const divMain = document.querySelector("main");
     divMain.innerHTML = quizzToRender;
@@ -512,7 +520,6 @@ function validarPerguntas() {
             validadores.push(false);
         }
     }
-    console.log(validadores);
     if (validadores.indexOf(false) == -1) {
         quizzCriadoObj.questions = questions;
         renderFormNiveisQuizz();
@@ -690,7 +697,6 @@ function validarNivel() {
     const validadores = [];
     let levels = [];
     const element = document.querySelectorAll(".fields");
-    console.log(element);
     for (let index = 0; index < element.length; index++) {
         const field = element[index];
         const titulo = field.querySelector(`[name="titleLevel${index + 1}"]`);
@@ -813,30 +819,51 @@ function renderResultado(nivel, porcentagem) {
         </div>
         <button class="btn-criar" onclick="onTapReiniciarQuizz()">Reiniciar Quizz</button>
         <span class="sub-text" onclick="onTapBackHome()">Voltar pra home</span>
-`;
+    `;
     divMain.innerHTML += cardResultado;
 }
 
-function finishQuizz() {
+function onTapReiniciarQuizz(){
+    qtdAcertos = 0;
+    onTapQuizz(currentQuizz);
+}
 
+function finishQuizz() {
     //calcula a porcentagem, precisa passar acertos e perguntas
     const porcentagem = calcularPorcentagem();
     //adiciona o cardzinho de resposta
     const nivel = getNivel(porcentagem);
     //renderiza o cardzinho na tela
-    renderResultado(nivel, porcentagem);
     //scrolla pro fim
-    setTimeout(scrollToBottom(), 200);
+    setTimeout(()=>{
+        renderResultado(nivel, porcentagem);
+        scrollToBottom();
+    }, 2000);
 }
 
-function calcularPorcentagem(qtdAcertos, qtdPerguntas) {
-    return Math.ceil((qtdAcertos / qtdPerguntas) * 100);
+function onTapRight(){
+    qtdAcertos++;
+}
+
+function calcularPorcentagem() {
+    return Math.ceil((qtdAcertos / currentQuizz.questions.length) * 100);
+}
+
+function isLesserThanPercentage(porcentagem, nivel){
+    return Number(nivel.minValue) <= porcentagem;
 }
 
 function getNivel(porcentagem) {
+    const niveisMenores = currentQuizz.levels.filter((nivel) => isLesserThanPercentage(porcentagem, nivel));
     //pegar o nivel onde a porcentagem é a maior entre as menores que o resultado
-    const nivel = {};
+    const nivel = niveisMenores.reduce((a, b) => a.minValue > b.minValue ? a : b);
     return nivel;
+}
+
+function onTapLast(isLast){
+    if(isLast){
+        finishQuizz();
+    }
 }
 
 function scrollToBottom() {
@@ -847,6 +874,5 @@ function scrollToTop() {
     window.scrollTo(0, 0);
 }
 
-func
 
 iniciarBuzzQuizz();
