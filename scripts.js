@@ -11,8 +11,9 @@ let idsQuizzesUsuario = []; //Lista com os IDS de quizzes do usuário
 let quizzes;
 let quizzesUsuario;
 
-function comparador() { 
-	return Math.random() - 0.5; 
+
+function comparador() {
+    return Math.random() - 0.5;
 }
 
 
@@ -40,16 +41,19 @@ const quizzCriadoObj = {};
 
 function iniciarBuzzQuizz() {
     document.querySelector("main").innerHTML = "";
-    getQuizzes();
     getQuizzesUsuario();
+    getQuizzes();
 }
 
 function isUserQuizz(quizz) {
-    return idsQuizzesUsuario.includes(quizz.id);
+    console.log(quizz.id);
+    console.log(idsQuizzesUsuario);
+    console.log(idsQuizzesUsuario.includes(quizz.id));
+    return idsQuizzesUsuario.includes(quizz.id.toString());
 }
 
 function isntUserQuizz(quizz) {
-    return idsQuizzesUsuario.indexOf(quizz.id) == -1
+    return idsQuizzesUsuario.indexOf(quizz.id.toString()) == -1
 }
 
 //requisiçoes
@@ -57,7 +61,6 @@ function getQuizzes() {
     const promise = axios.get(API_URL + RECURSO_QUIZZES_URL);
     promise.then((response) => {
         const listQuizzes = response.data.map(quizzConstructor);
-        console.log(listQuizzes);
         quizzesUsuario = listQuizzes.filter(isUserQuizz);
         quizzes = listQuizzes.filter(isntUserQuizz);
         renderListQuizzesUsuario(quizzesUsuario);
@@ -72,8 +75,9 @@ function getQuizzes() {
 function saveQuizz() {
     const promise = axios.post(API_URL + RECURSO_QUIZZES_URL, quizzCriadoObj);
     promise.then((response) => {
-        const listQuizzes = response.data.map(quizzConstructor);
-        renderListQuizzes(listQuizzes);
+        const createdQuizz = quizzConstructor(response.data);
+        idsQuizzesUsuario.push(createdQuizz.id);
+        setQuizzesUsuario();
     });
     promise.then((error) => {
         console.log(error);
@@ -102,14 +106,12 @@ function onTapQuizz(quizz) {
     renderPageQuizz(quizz);
 }
 
-renderPageQuizz(quizz){
-}
 
 
 //TELA PRINCIPAL =======================================
 function renderListQuizzes(quizzes) {
     const quizzesList = `
-        <div>
+        <div style="width: 100%">
             <div class="title-list-content"><span class="title-list">Todos os quizzes</span></div>
             <div class="lista-quizzes">
             </div>
@@ -131,7 +133,7 @@ function renderListQuizzesUsuario(quizzes) {
                 </div>`;
     } else {
         quizzesList = `
-            <div>
+            <div style="width: 100%">
                 <div class="title-list-content"><span class="title-list" style="width:auto">Seus quizzes</span> <div class="add-button" onclick="renderFormInfoBasicaQuizz()"><ion-icon name="add-outline"></ion-icon></div></div>
                 <div class="lista-quizzes-usuario">
                 </div>
@@ -147,7 +149,7 @@ function renderListQuizzesUsuario(quizzes) {
 function renderCardQuizzLista(quizz) {
     const cardQuizz = document.createElement("div");
     cardQuizz.setAttribute("class", "card-quizz");
-    cardQuizz.addEventListener("click", function(){
+    cardQuizz.addEventListener("click", function () {
         onTapQuizz(quizz);
     });
     cardQuizz.innerHTML = `<img src="${quizz.image}"
@@ -222,13 +224,13 @@ function abrirElemento(elemento) {
 
 //Renderização visual
 //function renderCardQuizzCricao(quizz) {
-  //  const cardQuizz = `<div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
-   //         <img src="${quizz.image}"
-    //            alt="Imagem de exibição do Quizz">
-      //      <div class="degrade-card-quizz"></div>
-        //    <span>${quizz.title}</span>
-       // </div>`;
-    //document.querySelector(".lista-quizzes").innerHTML += cardQuizz;
+//  const cardQuizz = `<div class="card-quizz criacao-card" onclick="onTapQuizz('${quizz}')">
+//         <img src="${quizz.image}"
+//            alt="Imagem de exibição do Quizz">
+//      <div class="degrade-card-quizz"></div>
+//    <span>${quizz.title}</span>
+// </div>`;
+//document.querySelector(".lista-quizzes").innerHTML += cardQuizz;
 //}
 
 //Aqui recebe o objeto do quizz como parametro pra já renderizar com as informaçoes corretas
@@ -293,7 +295,7 @@ function renderFormPerguntasQuizz() {
     const form = `<div class="title-form">Crie suas perguntas</div>
     <div>
         ${perguntas}
-        <button type="submit" class="btn-criar">Prosseguir para criar níveis</button>
+        <button type="submit" onclick="submitAll()" class="btn-criar">Prosseguir para criar níveis</button>
     </div>`;
     const divMain = document.querySelector("main");
     divMain.innerHTML = form;
@@ -304,28 +306,28 @@ function renderFormNiveisQuizz() {
 
     for (let i = 0; i < qtdNiveis; i++) {
 
-        if(i===0){
+        if (i === 0) {
             niveis += `
             <div class="fields">
                 <div class="title-text-field"> Nivel ${i + 1}</div>                
                 <div>
-                    <input class="text-field" name="titleLevel${i + 1}" type="text" placeholder="Título do nível">
-                    <input class="text-field" name="percRight${i + 1}" type="number" placeholder="% de acerto mínima">
-                    <input class="text-field" name="urlLevel${i + 1}" type="url" placeholder="Url da imagem do nível ">
-                    <input class="text-field" name="descriptionLevel${i + 1}" type="text" placeholder="Descrição do nível">
+                    <div><input class="text-field" name="titleLevel${i + 1}" type="text" placeholder="Título do nível"></div>
+                    <div><input class="text-field" name="percRight${i + 1}" type="number" placeholder="% de acerto mínima"></div>
+                    <div><input class="text-field" name="urlLevel${i + 1}" type="url" placeholder="Url da imagem do nível "></div>
+                    <div><input class="text-field" name="descriptionLevel${i + 1}" type="text" placeholder="Descrição do nível"></div>                    
                 </div>
             </div>
         `
 
-        } else{
+        } else {
             niveis += `
                 <div class="fields">
                     <div class="title-text-field"> <span> Nivel ${i + 1} </span>  <img src="/img/preencher.png" alt="" onclick="abrirElemento(this)"></div>                
                     <div class="hide-questions hidden">
-                    <input class="text-field" name="titleLevel${i + 1}" type="text" placeholder="Título do nível">
-                    <input class="text-field" name="percRight${i + 1}" type="number" placeholder="% de acerto mínima">
-                    <input class="text-field" name="urlLevel${i + 1}" type="url" placeholder="Url da imagem do nível ">
-                    <input class="text-field" name="descriptionLevel${i + 1}" type="text" placeholder="Descrição do nível">
+                    <div><input class="text-field" name="titleLevel${i + 1}" type="text" placeholder="Título do nível"></div>
+                    <div> <input class="text-field" name="percRight${i + 1}" type="number" placeholder="% de acerto mínima"></div>
+                    <div> <input class="text-field" name="urlLevel${i + 1}" type="url" placeholder="Url da imagem do nível "></div>
+                    <div><input class="text-field" name="descriptionLevel${i + 1}" type="text" placeholder="Descrição do nível"></div>
                     </div>
                 </div>
             `
@@ -358,7 +360,7 @@ function validarFormInfoBasica() {
         quizzCriadoObj.image = listaInputs[1].value;
         qtdPerguntas = listaInputs[2].value;
         qtdNiveis = listaInputs[3].value;
-        renderFormNiveisQuizz();
+        renderFormPerguntasQuizz();
     }
 }
 
@@ -371,21 +373,17 @@ function validarPerguntas() {
         const form = element[index];
         const pergunta = form.querySelector(`[name="titleQuestion${index + 1}"]`);
         const cor = form.querySelector(`[name="colorQuestion${index + 1}"]`);
-
         const correctResponse = form.querySelector(`[name="textAnswer${index + 1}"]`);
         const correctUrl = form.querySelector(`[name="urlAnswer${index + 1}"]`);
-
         const response1 = form.querySelector(`[name="textAnswer1${index + 1}"]`);
         const url1 = form.querySelector(`[name="urlAnswer1${index + 1}"]`);
-
         const response2 = form.querySelector(`[name="textAnswer2${index + 1}"]`);
         const url2 = form.querySelector(`[name="urlAnswer2${index + 1}"]`);
-
         const response3 = form.querySelector(`[name="textAnswer3${index + 1}"]`);
         const url3 = form.querySelector(`[name="urlAnswer3${index + 1}"]`);
-
         const _questionIsValid = questionIsValid(pergunta);
         const _colorIsValid = colorIsValid(cor);
+
         const _correctAnswerIsValid = correctAnswerIsValid(correctResponse, correctUrl);
         const _wrongAnswersIsValid = verifyWrongAnswers(response1, url1, response2, url2, response3, url3);
 
@@ -427,12 +425,10 @@ function validarPerguntas() {
             validadores.push(false);
         }
     }
+    console.log(validadores);
     if (validadores.indexOf(false) == -1) {
         quizzCriadoObj.questions = questions;
-        console.log(quizzCriadoObj);
         renderFormNiveisQuizz();
-    } else {
-        alert("Ops! Um ou mais campos foram preenchidos de forma errada!");
     }
 }
 
@@ -614,8 +610,7 @@ function validarNivel() {
         const url = field.querySelector(`[name="urlLevel${index + 1}"]`);
         const texto = field.querySelector(`[name="descriptionLevel${index + 1}"]`);
         const acertos = field.querySelector(`[name="percRight${index + 1}"]`);
-        
-       
+
         const _titleLevelIsValid = tituloNivelisValid(titulo);
         const _percRightIsValid = acertoIsValid(acertos);
         const _descriptionIsValid = descricaoNivelisValid(texto);
@@ -632,41 +627,51 @@ function validarNivel() {
         } else {
             validadores.push(false);
         }
- 
+
     }
     const minValues = levels.filter(temZero);
 
-    if (validadores.indexOf(false) == -1 && minValues.length >= 1) {
-        quizzCriadoObj.levels = levels;
-        console.log(quizzCriadoObj);
-        //finalizar e mandar o quizz pro sistema 
-        //saveQuizz();
-        renderQuizzCreated(quizzCriadoObj);
-
-        console.log('deucerto');
-    } else {
-        alert("Ops! Um ou mais campos foram preenchidos de forma errada!");
+    if (validadores.indexOf(false) == -1) {
+        if (minValues.length == 0) {
+            for (let index = 0; index < element.length; index++) {
+                const acertos = element[index].querySelector(`[name="percRight${index + 1}"]`);
+                addErrorText(acertos, "Ao menos uma das porcentagens de acertos deve ser igual a 0.");
+            }
+        } else {
+            quizzCriadoObj.levels = levels;
+            //finalizar e mandar o quizz pro sistema 
+            saveQuizz();
+            renderQuizzCreated(quizzCriadoObj);
+        }
     }
 
 }
 
 function tituloNivelisValid(titulo) {
-    if ((titulo.value).length > 10) {
+    removeErrorText(titulo);
+    if ((titulo.value).length >= 10) {
         return true;
     } else {
+        if (titulo.value == "") {
+            addErrorText(titulo, "Informe o título!");
+        } else {
+            addErrorText(titulo, "O título deve ter pelo menos 10 caracteres!");
+        }
         return false;
     }
 }
 
 function acertoIsValid(acertos) {
-
-    if(acertos.value === ""){
+    removeErrorText(acertos);
+    if (acertos.value === "") {
+        addErrorText(acertos, "Informe a porcentagem de acertos!");
         return false
-    } else{
+    } else {
         const percAcertos = Number(acertos.value);
         if (percAcertos >= 0 && percAcertos <= 100) {
             return true;
         } else {
+            addErrorText(acertos, "A porcentagem de acertos deve estar entre 0 e 100!");
             return false;
         }
 
@@ -674,18 +679,34 @@ function acertoIsValid(acertos) {
 }
 
 function descricaoNivelisValid(texto) {
-    if ((texto.value).length > 30) {
+    removeErrorText(texto);
+    if ((texto.value).length >= 30) {
         return true;
     } else {
+        if (texto.value == "") {
+            addErrorText(texto, "Informe a descrição!");
+        } else {
+            addErrorText(texto, "A descrição deve ter no mínimo 30 caracteres!");
+        }
         return false;
     }
 }
 
-function temZero(elemento){
-    if(elemento.minValue === 0){
+function temZero(elemento) {
+    if (elemento.minValue === 0) {
         return true
-    } else{
+    } else {
         return false
+    }
+}
+
+function submitAll() {
+    const forms = document.forms;
+    for (let i = 0; i < forms.length; i++) {
+        const formValido = forms[i].reportValidity();
+        if (formValido) {
+            forms[i].submit();
+        }
     }
 }
 
