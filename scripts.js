@@ -99,10 +99,72 @@ function onTapBackHome() {
 //Aqui recebe o quizz(index no array, id ou objeto) como parametro para renderizar na tela
 function onTapQuizz(quizz) {
     console.log(quizz);
+    
     renderPageQuizz(quizz);
 }
 
-renderPageQuizz(quizz){
+function renderPageQuizz(quizz){
+    console.log(quizz);
+    console.log(quizz.title);
+    console.log(quizz.image);
+
+    console.log(quizz.questions.length);
+
+
+
+    let paginaQuizz = "";
+    let caixaPergunta = [];
+
+    let topoQuizz = `
+    <div class="banner">
+            <img src="${quizz.image}" alt="">
+            <div class="opaco">
+                <span>${quizz.title}</span>
+            </div>
+        </div>
+    `
+    for(let i = 0; i < quizz.questions.length; i++){
+        let pergunta = quizz.questions;
+        let respostas= {};
+
+        console.log(pergunta);
+        for(let j = 0; j < pergunta[i].answers.length; j++){
+            
+            let resposta = pergunta[i].answers;
+            let respostaAleatoria = resposta.sort(comparador);
+            
+            if(respostaAleatoria[j].isCorrectAnswer){
+                respostas += `<li class="opcao certa">
+                        <img src=${resposta[j].image} alt="">
+                        <div>${resposta[j].text}</div>
+                    </li>`
+            } else{
+                respostas += `<li class="opcao errada">
+                        <img src=${resposta[j].image} alt="">
+                        <div>${resposta[j].text}</div>
+                    </li>`
+            }
+
+            caixaPergunta += `
+            <div class="perguntas" >
+            <div style="background-color:${pergunta[i].color};"> <p>${pergunta[i].title}</p></div>
+            <ul class="opcoes">
+                ${respostas}
+            </ul>
+        </div>
+        `
+        }
+
+    const divMain = document.querySelector("main");
+    divMain.innerHTML = '';
+
+    const divContainer = document.querySelector(".container");
+    divContainer.innerHTML = topoQuizz + caixaPergunta;
+
+
+
+    
+}
 }
 
 
