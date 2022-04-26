@@ -406,6 +406,51 @@ main>div {
     margin: 2px auto 18px auto;
 }
 
+/*Isso aqui faz a caixinha de resultado!!*/
+
+.resultado {
+    margin-top: 44px;
+    box-sizing: border-box;
+    padding: 12px;
+    width: 100%;
+    height: 430px;
+    background-color: white;
+}
+
+.resultado .cabecalho {
+    height: 99px;
+    width: 100%;
+    background-color: #EC362D;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 23px;
+}
+
+.resultado .corpo {
+    height: 273px;
+    align-items: flex-start;
+    display: flex;
+}
+
+.resultado .corpo img {
+    height: 273px;
+    width: 100%;
+    margin-right: 21px;
+}
+
+.resultado .corpo .descricao {
+    height: 273px;
+    width: 100%;
+    font-size: 19px;
+    font-weight: 700;
+    color: #484848;
+    line-height: 25px;
+}
+
 /*Para os boxes com error*/
 .error-input {
     background-color: #FFE9E9;

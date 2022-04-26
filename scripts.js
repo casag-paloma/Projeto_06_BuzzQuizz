@@ -278,16 +278,16 @@ function renderFormPerguntasQuizz() {
                     <div><input class="text-field" name="colorQuestion${i + 1}" type="text" placeholder="Cor de fundo da pergunta (#FFFFFF)"></div>
                 
                     <div class="title-text-field">Resposta correta </div>
-                    <div><input class="text-field" name="textAnswer${i + 1}" type="text" placeholder="Texto da pergunta"></div>
+                    <div><input class="text-field" name="textAnswer${i + 1}" type="text" placeholder="Resposta correta"></div>
                     <div><input class="text-field" name="urlAnswer${i + 1}" type="url" placeholder="Url da imagem"></div>
             
                     <div class="title-text-field">Resposta incorreta </div>
-                    <div><input class="text-field" name="textAnswer1${i + 1}" type="text" placeholder="Texto da pergunta"></div>
-                    <div><input class="text-field" name="urlAnswer1${i + 1}" type="url" placeholder="Url da imagem"></div>
-                    <div><input class="text-field" name="textAnswer2${i + 1}" type="text" placeholder="Texto da pergunta"></div>
-                    <div><input class="text-field" name="urlAnswer2${i + 1}" type="url" placeholder="Url da imagem"></div>
-                    <div><input class="text-field" name="textAnswer3${i + 1}" type="text" placeholder="Texto da pergunta"></div>
-                    <div><input class="text-field" name="urlAnswer3${i + 1}" type="url" placeholder="Url da imagem"></div>
+                    <div><input class="text-field" name="textAnswer1${i + 1}" type="text" placeholder="Resposta incorreta1"></div>
+                    <div><input class="text-field" name="urlAnswer1${i + 1}" type="url" placeholder="Url da imagem1"></div>
+                    <div><input class="text-field" name="textAnswer2${i + 1}" type="text" placeholder="Resposta incorreta2"></div>
+                    <div><input class="text-field" name="urlAnswer2${i + 1}" type="url" placeholder="Url da imagem2"></div>
+                    <div><input class="text-field" name="textAnswer3${i + 1}" type="text" placeholder="Resposta incorreta3"></div>
+                    <div><input class="text-field" name="urlAnswer3${i + 1}" type="url" placeholder="Url da imagem3"></div>
                 </div>
             </div> 
         </form>`
@@ -708,6 +708,56 @@ function submitAll() {
             forms[i].submit();
         }
     }
+}
+
+function renderResultado(nivel, porcentagem) {
+    const divMain = document.querySelector("main");
+    const cardResultado = `<div class="resultado">
+            <div class="cabecalho">
+                ${porcentagem}%: ${nivel.title}
+            </div>
+            <div class="corpo">
+                <img src="${nivel.image}"
+                    alt="Imagem de resultado do quizz">
+                <div class="descricao">
+                    ${nivel.text}
+                </div>
+            </div>
+        </div>
+        <button class="btn-criar" onclick="onTapReiniciarQuizz()">Reiniciar Quizz</button>
+        <span class="sub-text" onclick="onTapBackHome()">Voltar pra home</span>
+`;
+    divMain.innerHTML += cardResultado;
+}
+
+function finishQuizz() {
+
+    //calcula a porcentagem, precisa passar acertos e perguntas
+    const porcentagem = calcularPorcentagem();
+    //adiciona o cardzinho de resposta
+    const nivel = getNivel(porcentagem);
+    //renderiza o cardzinho na tela
+    renderResultado(nivel, porcentagem);
+    //scrolla pro fim
+    setTimeout(scrollToBottom(), 200);
+}
+
+function calcularPorcentagem(qtdAcertos, qtdPerguntas) {
+    return Math.ceil((qtdAcertos / qtdPerguntas) * 100);
+}
+
+function getNivel(porcentagem) {
+    //pegar o nivel onde a porcentagem é a maior entre as menores que o resultado
+    const nivel = {};
+    return nivel;
+}
+
+function scrollToBottom() {
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+function scrollToTop() {
+    window.scrollTo(0, 0);
 }
 
 iniciarBuzzQuizz();
