@@ -33,6 +33,10 @@ header {
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
+header > span:hover {
+    cursor: pointer;
+}
+
 
 main {
     width: 100%;
@@ -454,6 +458,18 @@ main>div {
 /*Para os boxes com error*/
 .error-input {
     background-color: #FFE9E9;
+}
+
+.div-opaca{
+    opacity: 0.3;
+}
+
+.right-answer{
+    color: green !important;
+}
+
+.wrong-answer{
+    color: red !important;
 }
 
 .error-text {

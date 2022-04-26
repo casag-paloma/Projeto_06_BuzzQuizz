@@ -11,6 +11,11 @@ let idsQuizzesUsuario = []; //Lista com os IDS de quizzes do usuário
 let quizzes;
 let quizzesUsuario;
 
+//perguntas e respostas - lista de objetos
+let perguntas;
+let qtdAcertos = 0;
+
+
 
 function comparador() {
     return Math.random() - 0.5;
@@ -156,7 +161,8 @@ function renderCardQuizzLista(quizz) {
                 alt="Imagem de exibição do Quizz">
             <div class="degrade-card-quizz"></div>
             <span>${quizz.title}</span>`;
-
+            cardQuizz.classList.add("div-opaca");
+            cardQuizz.classList.add("right-answer");
     const element = document.querySelector(".lista-quizzes");
     element.append(cardQuizz);
 }
@@ -169,7 +175,7 @@ function renderCardQuizzListaUsuario(quizz) {
                 alt="Imagem de exibição do Quizz">
             <div class="degrade-card-quizz"></div>
             <span>${quizz.title}</span>`;
-
+    
     const element = document.querySelector(".lista-quizzes-usuario");
     element.append(cardQuizz);
 }
@@ -759,5 +765,7 @@ function scrollToBottom() {
 function scrollToTop() {
     window.scrollTo(0, 0);
 }
+
+func
 
 iniciarBuzzQuizz();
