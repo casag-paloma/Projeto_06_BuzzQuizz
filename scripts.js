@@ -107,7 +107,6 @@ function onTapQuizz(quizz) {
     renderPageQuizz(quizz);
 }
 
-<<<<<<< HEAD
 function renderPageQuizz(quizz){
     console.log(quizz);
     console.log(quizz.title);
@@ -171,8 +170,6 @@ function renderPageQuizz(quizz){
     
 }
 }
-=======
->>>>>>> origin/main
 
 
 //TELA PRINCIPAL =======================================
@@ -767,9 +764,6 @@ function temZero(elemento) {
     }
 }
 
-<<<<<<< HEAD
-iniciarBuzzQuizz();
-=======
 function submitAll() {
     const forms = document.forms;
     for (let i = 0; i < forms.length; i++) {
@@ -831,4 +825,3 @@ function scrollToTop() {
 }
 
 iniciarBuzzQuizz();
->>>>>>> origin/main
